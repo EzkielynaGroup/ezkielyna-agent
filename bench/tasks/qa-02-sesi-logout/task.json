@@ -1,0 +1,28 @@
+{
+  "id": "qa-02-sesi-logout",
+  "category": "qa",
+  "lang": "id",
+  "title": "Kenapa pengguna ter-logout beberapa detik setelah login",
+  "prompt": "Pengguna mengeluh langsung ter-logout beberapa detik setelah login, padahal sesi seharusnya berlaku 1 jam. Tolong cari penyebabnya: di file mana, fungsi apa, dan kenapa bisa begitu? Jelaskan juga perbaikannya. Jangan ubah kodenya, cukup jelaskan.",
+  "keywords": [
+    [
+      "session.ts"
+    ],
+    [
+      "buatSesi"
+    ],
+    [
+      "SESSION_TTL_DETIK"
+    ],
+    [
+      "milidetik",
+      "millisecond",
+      "ms"
+    ],
+    [
+      "1000",
+      "1.000",
+      "1e3"
+    ]
+  ]
+}

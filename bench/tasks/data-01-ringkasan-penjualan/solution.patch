@@ -1,0 +1,12 @@
+diff --git a/ringkasan.csv b/ringkasan.csv
+new file mode 100644
+index 0000000..4b698d7
+--- /dev/null
++++ b/ringkasan.csv
+@@ -0,0 +1,6 @@
++kota,total_omzet
++Jakarta,7124000
++Makassar,4907000
++Surabaya,4876000
++Bandung,2646000
++Medan,1872000

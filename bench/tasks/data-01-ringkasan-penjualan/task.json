@@ -1,0 +1,8 @@
+{
+  "id": "data-01-ringkasan-penjualan",
+  "category": "data",
+  "lang": "id",
+  "title": "Ringkasan omzet per kota dari CSV",
+  "prompt": "Dari file penjualan.csv, buatkan file ringkasan.csv yang berisi total omzet (qty × harga_satuan) per kota. Kolomnya: kota,total_omzet (angka bulat, tanpa titik/koma ribuan), urut dari omzet terbesar. Jangan ubah penjualan.csv.",
+  "verify": "python3 .verify/check.py"
+}

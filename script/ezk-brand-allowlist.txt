@@ -1,0 +1,68 @@
+# Remaining upstream-brand strings that are intentionally kept (category B). Format: path-glob:pattern
+# pattern = literal substring of the line, or re:<regex>. Everything else that names OpenCode in packages/*/src fails
+# `bun script/ezk-brand-guard.ts`. Supplier names are never allowlistable.
+
+# --- Locales other than en/id: the runtime layer brandText() (core/src/ezkielyna-brand.ts, covered by core/test/ezkielyna/brand.test.ts)
+# rewrites "OpenCode" for every locale in the app, desktop renderer and native menus. Lines with an upstream URL are NOT allowed.
+packages/app/src/i18n/*.ts:re:^(?!.*(opencode\.ai|opncd\.ai|anomalyco)).*OpenCode
+packages/desktop/src/renderer/i18n/*.ts:re:^(?!.*(opencode\.ai|opncd\.ai|anomalyco)).*OpenCode
+# packages/ui locale strings were rewritten in source (single line, "Go" upsell), nothing allowed here.
+
+# --- Not shipped in the product: docs site, marketing site content, Slack example bot, GitHub agent (command not registered).
+packages/web/src/content/**:re:.
+packages/web/src/components/Lander.astro:re:.
+packages/web/src/components/V2Banner.astro:re:.
+packages/slack/src/index.ts:re:.
+packages/opencode/src/cli/cmd/github.handler.ts:re:.
+packages/opencode/src/control-plane/dev/README.md:re:.
+packages/opencode/src/session/llm/AGENTS.md:re:.
+packages/plugin/src/v2/**/README.md:OpenCode
+packages/script/src/index.ts:opencode script
+
+# --- Upstream-only provider plugin (OpenCode Console login). Removed from the registered plugin list in core/src/plugin/provider.ts.
+packages/core/src/plugin/provider/opencode.ts:re:.
+
+# --- Attribution required by the MIT licence.
+packages/desktop/src/main/index.ts:Based on OpenCode (MIT)
+packages/core/src/ezkielyna-brand.ts:text.replace(/OpenCode/g
+
+# --- Protocol / API identifiers, kept for SDK + openapi.json parity (regenerating them needs a full SDK build; see INTEGRATION-BRAND.md).
+packages/protocol/src/api.ts:title: "opencode HttpApi"
+packages/protocol/src/groups/session.ts:this OpenCode process
+packages/core/src/v1/config/config.ts:opencode serve and web commands
+packages/core/src/v1/config/config.ts:opencode.ai/docs/
+packages/core/src/v1/config/config.ts:opencode upgrade
+packages/httpapi-codegen/src/index.ts:export * as OpenCode from
+packages/opencode/src/session/llm/native-runtime.ts:provider is not openai, opencode, or anthropic
+
+# --- Syntax-highlighter theme id "OpenCode", css class and exported theme identifiers (internal ids, not rendered text).
+packages/ui/src/context/marked-theme-register.tsx:registerCustomTheme("OpenCode"
+packages/ui/src/context/marked-theme.tsx:name: "OpenCode"
+packages/ui/src/context/marked.tsx:"OpenCode"
+packages/session-ui/src/pierre/*.ts:theme: "OpenCode"
+packages/session-ui/src/components/markdown.worker.ts:theme: "OpenCode"
+packages/session-ui/src/components/markdown.tsx:shiki OpenCode
+packages/session-ui/src/components/markdown-stream.ts:openCode(
+packages/tui/src/theme/index.ts:  opencode,
+
+# --- Internal identifiers the heuristics cannot see (variables, directories, stores, process names, ids).
+packages/app/src/wsl/settings-model.ts:opencodeChecks
+packages/desktop/src/main/wsl/servers.ts:wsl opencode check failed
+packages/desktop/src/main/wsl/sidecar.ts:opencode
+packages/desktop/src/main/store-cleanup.ts:opencode\.
+packages/opencode/src/config/tui-migrate.ts:of opencode
+packages/opencode/src/index.ts:process.env.OPENCODE
+packages/opencode/src/server/mdns.ts:opencode-
+packages/core/src/database/database.ts:opencode-
+packages/server/src/cors.ts:opencodeOrigin
+packages/core/src/models-dev.ts:models.opencode.ai
+
+# --- Upstream endpoints: HTTP-Referer attribution headers sent to third-party gateways (not shown to users), and the opt-in UI proxy.
+packages/opencode/src/provider/provider.ts:re:[Rr]eferer.*opencode\.ai
+packages/core/src/plugin/provider/*.ts:re:[Rr]eferer.*opencode\.ai
+packages/opencode/src/server/shared/ui.ts:UI_UPSTREAM = new URL
+packages/opencode/src/server/routes/instance/httpapi/**:re:opencode (experimental )?HttpApi|opencode api|serve and web|Upgrade opencode
+
+# Attribution required by the MIT licence, and the upstream env flag child processes check.
+packages/core/src/ezkielyna-brand.ts:Based on OpenCode (MIT)
+packages/opencode/src/cli-main.ts:process.env.OPENCODE = "1"

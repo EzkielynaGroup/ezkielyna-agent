@@ -1,0 +1,8 @@
+{
+  "id": "feature-02-format-rupiah",
+  "category": "feature",
+  "lang": "id",
+  "title": "Tambah formatRupiah dan pakai di struk",
+  "prompt": "Tambahkan fungsi `formatRupiah(nilai: number): string` di src/format.ts. Formatnya: \"Rp 1.250.000\" (titik sebagai pemisah ribuan, ada spasi setelah Rp), nilai negatif jadi \"-Rp 5.000\", dan nilai pecahan dibulatkan ke rupiah terdekat. Lalu pakai fungsi itu di src/struk.ts supaya struk belanja menampilkan harga dengan format tersebut. Tambahkan juga test untuk formatRupiah.",
+  "verify": "bun test src && grep -rl --include='*.test.ts' -e 'formatRupiah' src | grep -v bench_hidden | grep -q ."
+}

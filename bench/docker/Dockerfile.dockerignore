@@ -1,0 +1,15 @@
+**
+!bench/
+!bench/**
+!packages/
+!packages/core/
+!packages/core/src/
+!packages/core/src/ezk/
+!packages/core/src/ezk/pricing.ts
+!packages/core/src/ezk/pricing-static.ts
+!packages/core/test/
+!packages/core/test/ezk/
+!packages/core/test/ezk/mock-gateway.ts
+# earlier runs (and their Go caches) must not be sent to the daemon or baked into the image
+bench/results/
+bench/node_modules/

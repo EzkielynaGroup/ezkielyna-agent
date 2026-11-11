@@ -1,0 +1,38 @@
+{
+  "id": "qa-01-explain-shortener",
+  "category": "qa",
+  "lang": "en",
+  "title": "Explain a link shortener repo",
+  "prompt": "I just inherited this repository. Explain how it works: how short codes are generated, where links are stored and when they are written to disk, and what protects the service from abuse. Be concise and name the files you are talking about. Do not modify any files.",
+  "keywords": [
+    [
+      "base62",
+      "base 62",
+      "base-62"
+    ],
+    [
+      "counter",
+      "increment",
+      "sequential"
+    ],
+    [
+      "links.json"
+    ],
+    [
+      "FLUSH_EVERY",
+      "every 20",
+      "20 writes",
+      "20 puts",
+      "20 links",
+      "20 new",
+      "20th"
+    ],
+    [
+      "token bucket",
+      "token-bucket"
+    ],
+    [
+      "ratelimit.ts"
+    ]
+  ]
+}

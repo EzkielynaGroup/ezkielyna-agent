@@ -1,0 +1,50 @@
+diff --git a/constants.py b/constants.py
+new file mode 100644
+index 0000000..9a5b995
+--- /dev/null
++++ b/constants.py
+@@ -0,0 +1,2 @@
++PPN = 0.11
++ONGKIR_DASAR = 15000
+diff --git a/harga.py b/harga.py
+index 093b9a0..da5a9c6 100644
+--- a/harga.py
++++ b/harga.py
+@@ -1,2 +1,3 @@
++from constants import ONGKIR_DASAR, PPN
+ def harga_dengan_ppn(harga):
+-    return round(harga * (1 + 0.11))
++    return round(harga * (1 + PPN))
+diff --git a/invoice.py b/invoice.py
+index 8e2de40..8f49aad 100644
+--- a/invoice.py
++++ b/invoice.py
+@@ -1,3 +1,4 @@
++from constants import ONGKIR_DASAR, PPN
+ from harga import harga_dengan_ppn
+ from ongkir import ongkir
+ 
+@@ -5,9 +6,9 @@ from ongkir import ongkir
+ def total_invoice(items, berat_kg):
+     """items: list of (nama, harga). PPN 11% dari subtotal, ongkir ditambahkan setelah PPN."""
+     subtotal = sum(harga for _, harga in items)
+-    ppn = round(subtotal * 0.11)
++    ppn = round(subtotal * PPN)
+     return {"subtotal": subtotal, "ppn": ppn, "ongkir": ongkir(berat_kg), "total": subtotal + ppn + ongkir(berat_kg)}
+ 
+ 
+ def ringkas(items):
+-    return f"{len(items)} barang, PPN {0.11:.0%}, ongkir mulai {15000}"
++    return f"{len(items)} barang, PPN {PPN:.0%}, ongkir mulai {ONGKIR_DASAR}"
+diff --git a/ongkir.py b/ongkir.py
+index e5e6f89..91f5da6 100644
+--- a/ongkir.py
++++ b/ongkir.py
+@@ -1,4 +1,5 @@
++from constants import ONGKIR_DASAR, PPN
+ def ongkir(berat_kg):
+     if berat_kg <= 1:
+-        return 15000
+-    return 15000 + (berat_kg - 1) * 5000
++        return ONGKIR_DASAR
++    return ONGKIR_DASAR + (berat_kg - 1) * 5000

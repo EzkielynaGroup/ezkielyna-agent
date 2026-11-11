@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "09c77801e6abb722b62e8918ef0a6bca0f0957d4",
+  "samples": 3,
+  "pointsSeconds": [8, 60, 180],
+  "gatePointSeconds": 180,
+  "medianRssMiB": {
+    "8": 420,
+    "60": 101,
+    "180": 100
+  },
+  "maxIncreasePercent": 15,
+  "measurement": "Bun source server launched by foreground shell exec, clean temporary HOME, 127.0.0.1; 180-second RSS is the stable-idle gate, 8/60-second points are diagnostic"
+}

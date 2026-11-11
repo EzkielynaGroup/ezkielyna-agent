@@ -1,0 +1,92 @@
+{"id": 1, "round": 1, "label": "light", "prompt": "Tolong cek typo di paragraf pertama laporan saya"}
+{"id": 2, "round": 1, "label": "light", "prompt": "how do i center a div"}
+{"id": 3, "round": 1, "label": "light", "prompt": "Buatkan ucapan terima kasih untuk dosen pembimbing, 2 kalimat saja"}
+{"id": 4, "round": 1, "label": "light", "prompt": "what's the difference between == and === in js?"}
+{"id": 5, "round": 1, "label": "light", "prompt": "hapus kolom D di spreadsheet ini dan simpan"}
+{"id": 6, "round": 1, "label": "light", "prompt": "Add a loading spinner to the submit button"}
+{"id": 7, "round": 1, "label": "light", "prompt": "Apa kepanjangan dari API?"}
+{"id": 8, "round": 1, "label": "light", "prompt": "translate 'good morning, how can I help you?' to Indonesian and Spanish"}
+{"id": 9, "round": 1, "label": "light", "prompt": "ubah judul halaman jadi 'Beranda' di index.html"}
+{"id": 10, "round": 1, "label": "light", "prompt": "Write a haiku about monday mornings"}
+{"id": 11, "round": 1, "label": "light", "prompt": "gimana cara pakai git stash?"}
+{"id": 12, "round": 1, "label": "light", "prompt": "Make the font size 16px in the footer"}
+{"id": 13, "round": 1, "label": "light", "prompt": "Tulis ringkasan 3 poin dari artikel ini: harga BBM naik karena kurs dan pajak"}
+{"id": 14, "round": 1, "label": "light", "prompt": "sort an array of objects by date in javascript"}
+{"id": 15, "round": 1, "label": "light", "prompt": "Rumus untuk hitung persentase kenaikan dari B2 ke C2"}
+{"id": 16, "round": 1, "label": "light", "prompt": "is this function pure? function add(a,b){return a+b}"}
+{"id": 17, "round": 1, "label": "light", "prompt": "tolong kasih nama variabel yang lebih bagus untuk 'd'"}
+{"id": 18, "round": 1, "label": "light", "prompt": "Bikin contoh soal cerita tentang kecepatan untuk kelas 5 SD"}
+{"id": 19, "round": 1, "label": "light", "prompt": "delete the old backup folder"}
+{"id": 20, "round": 1, "label": "light", "prompt": "Berapa hasil 15% dari 2.400.000?"}
+{"id": 21, "round": 1, "label": "heavy", "prompt": "Bikin aplikasi manajemen tugas dengan fitur kolaborasi tim, notifikasi, dan sinkronisasi offline"}
+{"id": 22, "round": 1, "label": "heavy", "prompt": "The login sometimes logs users out randomly. I've tried clearing cookies and changing the session timeout, nothing helps. Investigate."}
+{"id": 23, "round": 1, "label": "heavy", "prompt": "Tolong buatkan analisis SWOT dan rencana pemasaran 12 bulan untuk startup edukasi saya, lengkap dengan anggaran"}
+{"id": 24, "round": 1, "label": "heavy", "prompt": "Convert all the class components to hooks in the frontend"}
+{"id": 25, "round": 1, "label": "heavy", "prompt": "Write a complete thesis chapter reviewing literature on microfinance in Southeast Asia, with citations"}
+{"id": 26, "round": 1, "label": "heavy", "prompt": "perbaiki semua warning lint di repo ini dan pastikan test tetap hijau"}
+{"id": 27, "round": 1, "label": "heavy", "prompt": "Build a web scraper that collects product prices from 5 e-commerce sites daily, stores them in a database and sends a price-drop email"}
+{"id": 28, "round": 1, "label": "heavy", "prompt": "Kenapa aplikasi crash tiap kali upload file besar? Sudah cek log tapi tidak ada pesan jelas"}
+{"id": 29, "round": 1, "label": "heavy", "prompt": "Reorganize the folder structure of the project and fix all the import paths"}
+{"id": 30, "round": 1, "label": "heavy", "prompt": "Gabungkan 12 file excel laporan bulanan, samakan format kolomnya, hitung total per cabang, dan buat grafik tahunan"}
+{"id": 31, "round": 1, "label": "heavy", "prompt": "Design a database schema and REST API for a hotel booking platform, then implement it with tests"}
+{"id": 32, "round": 1, "label": "heavy", "prompt": "Buatkan website toko online lengkap dengan keranjang, checkout, dan panel admin"}
+{"id": 33, "round": 1, "label": "heavy", "prompt": "Our app takes 8 seconds to load the home page. Find the bottlenecks and fix them."}
+{"id": 34, "round": 1, "label": "heavy", "prompt": "Terjemahkan semua file lokalisasi di folder locales ke bahasa Jawa dan Sunda"}
+{"id": 35, "round": 1, "label": "heavy", "prompt": "Explain how authentication, authorization and session handling work throughout this codebase and where the weak points are"}
+{"id": 36, "round": 1, "label": "heavy", "prompt": "Tulis laporan kerja praktik 30 halaman tentang sistem informasi di PT tempat saya magang"}
+{"id": 37, "round": 1, "label": "heavy", "prompt": "Add unit tests for every public function in the services directory"}
+{"id": 38, "round": 1, "label": "heavy", "prompt": "Ganti library state management dari Redux ke Zustand di seluruh aplikasi"}
+{"id": 39, "round": 1, "label": "heavy", "prompt": "Implement a rate limiter with a sliding window, Redis backend and middleware for Express, with load tests"}
+{"id": 40, "round": 1, "label": "heavy", "prompt": "aplikasi sering hang di production, kadang memori naik terus, kadang CPU 100%. tolong selidiki dan perbaiki"}
+{"id": 41, "round": 2, "label": "light", "prompt": "Tolong carikan sinonim dari kata 'penting' untuk esai saya"}
+{"id": 42, "round": 2, "label": "light", "prompt": "how do I exit vim"}
+{"id": 43, "round": 2, "label": "light", "prompt": "Ubah teks tombol dari 'Kirim' jadi 'Submit' di form kontak"}
+{"id": 44, "round": 2, "label": "light", "prompt": "Write a SQL query that counts orders per day for the last 7 days"}
+{"id": 45, "round": 2, "label": "light", "prompt": "bikinin puisi pendek tentang hujan"}
+{"id": 46, "round": 2, "label": "light", "prompt": "Check if port 3000 is in use"}
+{"id": 47, "round": 2, "label": "light", "prompt": "Apa itu REST API? jawab singkat saja"}
+{"id": 48, "round": 2, "label": "light", "prompt": "make the navbar sticky"}
+{"id": 49, "round": 2, "label": "light", "prompt": "Tambahkan kolom total di tabel ini, isinya jumlah harga x qty"}
+{"id": 50, "round": 2, "label": "light", "prompt": "What's a good name for a coffee shop app?"}
+{"id": 51, "round": 2, "label": "light", "prompt": "Kasih saya 3 ide topik skripsi jurusan informatika"}
+{"id": 52, "round": 2, "label": "light", "prompt": "convert 5 miles to km"}
+{"id": 53, "round": 2, "label": "light", "prompt": "fix the indentation in main.py"}
+{"id": 54, "round": 2, "label": "light", "prompt": "Tolong koreksi ejaan teks ini: 'saya sedang mengerjakan tugas diperpustakan'"}
+{"id": 55, "round": 2, "label": "light", "prompt": "Write a function to reverse a linked list in Java"}
+{"id": 56, "round": 2, "label": "heavy", "prompt": "Bangun REST API untuk aplikasi toko buku: user, buku, pesanan, pembayaran, dengan validasi dan dokumentasi swagger"}
+{"id": 57, "round": 2, "label": "heavy", "prompt": "Something is wrong with our nightly job: it succeeds on some days and silently produces empty files on others. Dig in."}
+{"id": 58, "round": 2, "label": "heavy", "prompt": "Rapikan seluruh struktur proyek dan pastikan semua halaman masih berjalan"}
+{"id": 59, "round": 2, "label": "heavy", "prompt": "Write a 15-page literature review on remote work and productivity, APA style"}
+{"id": 60, "round": 2, "label": "heavy", "prompt": "Gabungkan data penjualan dari 4 cabang, bersihkan duplikat, hitung KPI bulanan, dan buat laporan eksekutif dalam bentuk dashboard"}
+{"id": 61, "round": 2, "label": "heavy", "prompt": "Add internationalization to the entire UI: extract every string, set up Indonesian and English files and a language switcher"}
+{"id": 62, "round": 2, "label": "heavy", "prompt": "Aplikasi Android saya force close di beberapa HP Samsung saja, tidak di Pixel. Tolong cari tahu kenapa dan perbaiki."}
+{"id": 63, "round": 2, "label": "heavy", "prompt": "Create a tutorial series of 6 lessons teaching Python to complete beginners, with exercises and answers for each lesson"}
+{"id": 64, "round": 2, "label": "heavy", "prompt": "Switch the backend from Express to Fastify and keep all existing routes and middleware working"}
+{"id": 65, "round": 2, "label": "heavy", "prompt": "Rancang sistem antrian rumah sakit berbasis web: pendaftaran pasien, nomor antrian real time, layar display, dan laporan"}
+{"id": 66, "round": 2, "label": "heavy", "prompt": "Why do the tests pass when I run them one by one but fail when I run the whole suite?"}
+{"id": 67, "round": 2, "label": "heavy", "prompt": "Implementasikan fitur chat antar pengguna dengan riwayat pesan, status online, dan notifikasi"}
+{"id": 68, "round": 2, "label": "heavy", "prompt": "Take this prototype notebook and turn it into a production-ready service with logging, config, tests and a Dockerfile"}
+{"id": 69, "round": 2, "label": "heavy", "prompt": "Terjemahkan dan sesuaikan seluruh materi kursus ini (35 dokumen) untuk audiens di Indonesia"}
+{"id": 70, "round": 2, "label": "heavy", "prompt": "Our checkout conversion dropped 20% after the last release. Look through the recent changes and find what broke it."}
+{"id": 71, "round": 3, "label": "light", "prompt": "Tolong buatkan 5 pertanyaan wawancara untuk kandidat frontend developer"}
+{"id": 72, "round": 3, "label": "light", "prompt": "how do I reset my git branch to match origin"}
+{"id": 73, "round": 3, "label": "light", "prompt": "Jelaskan apa itu normalisasi database dengan bahasa sederhana"}
+{"id": 74, "round": 3, "label": "light", "prompt": "change the background color to dark gray in styles.css"}
+{"id": 75, "round": 3, "label": "light", "prompt": "Tulis email singkat untuk menolak tawaran kerja dengan sopan"}
+{"id": 76, "round": 3, "label": "light", "prompt": "Buatkan rumus IF untuk memberi nilai A jika di atas 85, B jika di atas 70"}
+{"id": 77, "round": 3, "label": "light", "prompt": "write a bash one-liner to count lines in all .py files"}
+{"id": 78, "round": 3, "label": "light", "prompt": "Terjemahkan ke Inggris: Mohon maaf atas keterlambatan balasan saya, minggu ini jadwal sangat padat"}
+{"id": 79, "round": 3, "label": "light", "prompt": "what does the 'async' keyword do in python?"}
+{"id": 80, "round": 3, "label": "light", "prompt": "Buat fungsi untuk cek bilangan prima"}
+{"id": 81, "round": 3, "label": "light", "prompt": "Berikan 3 contoh kalimat efektif untuk pembuka surat lamaran"}
+{"id": 82, "round": 3, "label": "light", "prompt": "Add a docstring and type hints to calculate_tax"}
+{"id": 83, "round": 3, "label": "heavy", "prompt": "Bikin sistem reservasi lapangan futsal online dengan jadwal, pembayaran, dan dashboard pemilik"}
+{"id": 84, "round": 3, "label": "heavy", "prompt": "After merging the last PR, the staging server returns 500 on half of the requests. Find the cause and fix it."}
+{"id": 85, "round": 3, "label": "heavy", "prompt": "Tolong rapikan dan dokumentasikan seluruh kode di folder services, termasuk README tiap modul"}
+{"id": 86, "round": 3, "label": "heavy", "prompt": "Write a market analysis and 3-year financial projection for a delivery startup in Surabaya"}
+{"id": 87, "round": 3, "label": "heavy", "prompt": "Pindahkan penyimpanan file dari disk lokal ke S3 untuk semua fitur upload, dan sesuaikan test-nya"}
+{"id": 88, "round": 3, "label": "heavy", "prompt": "Make the app work offline: cache data, queue changes and sync when the connection returns"}
+{"id": 89, "round": 3, "label": "heavy", "prompt": "Data sensus di folder data/ formatnya beda-beda tiap provinsi. Satukan jadi satu tabel bersih lalu hitung statistik deskriptifnya."}
+{"id": 90, "round": 3, "label": "heavy", "prompt": "Our mobile app drains battery quickly after the latest update, please investigate what changed"}
+{"id": 91, "round": 3, "label": "heavy", "prompt": "Susun rencana pembelajaran satu semester untuk mata kuliah pemrograman web beserta tugas dan rubrik"}
+{"id": 92, "round": 3, "label": "heavy", "prompt": "Replace the custom auth with a proper library and update every place that checks permissions"}

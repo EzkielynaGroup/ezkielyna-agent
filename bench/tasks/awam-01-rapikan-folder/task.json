@@ -1,0 +1,8 @@
+{
+  "id": "awam-01-rapikan-folder",
+  "category": "awam",
+  "lang": "id",
+  "title": "Rapikan folder foto dan dokumen",
+  "prompt": "Tolong rapikan folder ini dong. Semua foto (jpg, jpeg, png, huruf besar atau kecil sama saja) pindahkan ke folder Foto, dan dokumen (pdf, docx) ke folder Dokumen. File lain biarkan saja di tempatnya. Jangan ada file yang hilang atau berubah isinya ya.",
+  "verify": "python3 .verify/check.py"
+}

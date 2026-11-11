@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-02-diskon-keranjang",
+  "category": "bugfix",
+  "lang": "id",
+  "title": "Total keranjang salah karena fungsi diskon",
+  "prompt": "Total belanja di keranjang salah: kalau tidak ada diskon hasilnya malah 0. Test di src/keranjang.test.ts gagal. Tolong cari penyebabnya dan perbaiki kodenya, jangan ubah test-nya.",
+  "verify": "bun test src"
+}

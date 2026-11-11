@@ -1,0 +1,20 @@
+
+
+
+
+
+
+
+
+     The plan is ready                                                            esc
+
+     Search
+
+     Approve & run (auto-edit) Edits inside this project run without asking; commands
+     Approve & ask at each step Every edit and command asks you first
+     Keep planning Stay in plan mode and refine it
+     Edit the plan Change the text, then approve it
+
+     1. Add the parser in src/parse.ts
+     2. Call it from src/main.ts
+     3. Run bun test

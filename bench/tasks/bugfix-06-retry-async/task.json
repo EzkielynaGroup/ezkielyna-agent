@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-06-retry-async",
+  "category": "bugfix",
+  "lang": "id",
+  "title": "Retry tidak pernah mengulang",
+  "prompt": "Fungsi denganUlang di src/retry.ts seharusnya mengulang panggilan async yang gagal, tapi kenyataannya langsung gagal di percobaan pertama. Test di src/retry.test.ts gagal. Perbaiki bug-nya tanpa mengubah test.",
+  "verify": "bun test src"
+}

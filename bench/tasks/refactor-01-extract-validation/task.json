@@ -1,0 +1,8 @@
+{
+  "id": "refactor-01-extract-validation",
+  "category": "refactor",
+  "lang": "en",
+  "title": "Extract a duplicated email check",
+  "prompt": "The same email regex is copy-pasted in src/user.ts, src/newsletter.ts and src/invite.ts. Extract it into one exported function `isValidEmail(email: string): boolean` in a new file src/validation.ts and use it in all three places. Behaviour (including error messages) must not change, and the existing tests must keep passing.",
+  "verify": "bun test src && bun .verify/check.ts"
+}

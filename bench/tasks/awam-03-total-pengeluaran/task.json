@@ -1,0 +1,16 @@
+{
+  "id": "awam-03-total-pengeluaran",
+  "category": "awam",
+  "lang": "id",
+  "title": "Hitung total pengeluaran mingguan",
+  "prompt": "Ini catatan pengeluaran saya minggu ini di pengeluaran.txt, tulisannya macam-macam (ada '65rb', 'Rp 250.000', '15 ribu'). Tolong hitung totalnya, lalu tulis di total.txt angkanya saja dalam rupiah tanpa titik (contoh: 125000). Sebutkan juga totalnya di jawabanmu.",
+  "verify": "test \"$(tr -d ' \\n\\r' < total.txt)\" = 537500",
+  "keywords": [
+    [
+      "537.500",
+      "537500",
+      "537,500",
+      "537 ribu"
+    ]
+  ]
+}

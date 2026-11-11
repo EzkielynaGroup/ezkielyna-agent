@@ -1,0 +1,106 @@
+name: bench-dry-run
+
+# Bench v2 (bench/) against the local mock gateway: checks that the 30 tasks are valid (the untouched repo fails,
+# the reference solution passes) and that the whole harness works end to end through the real agent CLI, with the
+# mock playing the model. No API key, no secrets, no network calls to the gateway. Manual runs only, to save
+# Actions minutes; real benchmark runs happen on the VPS (see bench/README.md).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tasks:
+        description: "Task filter (ids, id prefixes or category:<name>, comma-separated); empty = all 30"
+        required: false
+        default: ""
+      parallel:
+        description: "Tasks run at the same time"
+        required: false
+        default: "3"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dry-run:
+    name: bench dry run (linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+
+      - name: Read Bun version
+        id: meta
+        run: |
+          echo "bun=$(node -p "require('./package.json').packageManager.split('@')[1]")" >> "$GITHUB_OUTPUT"
+          echo "BUN_INSTALL_CACHE_DIR=$HOME/.bun/install/cache" >> "$GITHUB_ENV"
+
+      - name: Setup Bun ${{ steps.meta.outputs.bun }}
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ steps.meta.outputs.bun }}
+
+      - name: Cache Bun packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-
+
+      - name: Use the runner's Go and Python
+        # Go tasks verify with `go test` (no modules to download); data tasks verify with python3 (stdlib only).
+        run: |
+          if ! command -v go >/dev/null; then
+            dir=$(ls -d /opt/hostedtoolcache/go/1.2*/x64 2>/dev/null | sort -V | tail -1)
+            [ -n "$dir" ] && echo "$dir/bin" >> "$GITHUB_PATH"
+          fi
+          python3 --version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Bench unit tests
+        working-directory: bench
+        run: bun test ./test
+
+      - name: Check the tasks
+        run: |
+          go version
+          bun bench/check-tasks.ts ${TASKS:+--tasks "$TASKS"}
+        env:
+          TASKS: ${{ inputs.tasks }}
+
+      - name: Dry run through the agent
+        run: bun bench/run.ts --dry-run --bin source --parallel "$PARALLEL" --out bench-results ${TASKS:+--tasks "$TASKS"}
+        env:
+          TASKS: ${{ inputs.tasks }}
+          PARALLEL: ${{ inputs.parallel }}
+
+      - name: Job summary
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f bench-results/summary.md ]; then cat bench-results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: bench-dry-run-${{ github.run_id }}
+          path: bench-results/
+          if-no-files-found: warn
+          retention-days: 3

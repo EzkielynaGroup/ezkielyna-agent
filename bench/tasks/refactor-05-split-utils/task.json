@@ -1,0 +1,8 @@
+{
+  "id": "refactor-05-split-utils",
+  "category": "refactor",
+  "lang": "en",
+  "title": "Split a grab-bag utils module",
+  "prompt": "src/utils.ts mixes string and math helpers. Split it: move capitalize and truncate to src/strings.ts, and sum, average and clamp to src/math.ts. Update src/report.ts and src/profile.ts to import from the new modules directly, then delete src/utils.ts. Update the tests so they import from the new modules too.",
+  "verify": "bun test src && bun .verify/check.ts"
+}

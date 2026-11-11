@@ -1,0 +1,15 @@
+diff --git a/paginate/paginate.go b/paginate/paginate.go
+index 374becd..3c1db53 100644
+--- a/paginate/paginate.go
++++ b/paginate/paginate.go
+@@ -9,8 +9,8 @@ type Page[T any] struct {
+ }
+ 
+ func Paginate[T any](items []T, page, perPage int) Page[T] {
+-	totalPages := len(items) / perPage
+-	start := page * perPage
++	totalPages := (len(items) + perPage - 1) / perPage
++	start := (page - 1) * perPage
+ 	end := start + perPage
+ 	if start > len(items) {
+ 		start = len(items)

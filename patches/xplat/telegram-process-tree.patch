@@ -1,0 +1,28 @@
+diff --git a/packages/core/src/ezk/telegram/run.ts b/packages/core/src/ezk/telegram/run.ts
+--- a/packages/core/src/ezk/telegram/run.ts
++++ b/packages/core/src/ezk/telegram/run.ts
+@@ -1,6 +1,7 @@
+ // Wires the pieces together and runs the bridge until `signal` aborts. Nothing here runs unless someone calls it.
+ import { spawn, type ChildProcess } from "node:child_process"
+ import { randomBytes } from "node:crypto"
++import { stopProcessTree } from "../process-tree"
+ import fs from "node:fs"
+ import path from "node:path"
+ import { httpAgentClient } from "./agent-client"
+@@ -40,6 +41,6 @@
+     })
+     child.on("error", (e) => reject(e))
+     child.on("exit", () => reject(new Error("ezkielyna serve exited early")))
+-    signal.addEventListener("abort", () => child.kill("SIGTERM"), { once: true })
++    signal.addEventListener("abort", () => stopProcessTree(child), { once: true })
+   })
+ }
+@@ -87,7 +88,7 @@
+     await bridge.poll(opts.signal)
+   } finally {
+     bridge.stop()
+-    child?.kill("SIGTERM")
++    if (child) stopProcessTree(child)
+     log("bridge stopped")
+   }
+ }

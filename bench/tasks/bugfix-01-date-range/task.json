@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-01-date-range",
+  "category": "bugfix",
+  "lang": "en",
+  "title": "Off-by-one in an inclusive date range",
+  "prompt": "The tests in src/dates.test.ts are failing. Find the bug in the source and fix it. Do not change the tests.",
+  "verify": "bun test src"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-05-csv-quotes",
+  "category": "bugfix",
+  "lang": "en",
+  "title": "CSV parser splits quoted fields",
+  "prompt": "parse_line in csvlite.py breaks on quoted fields that contain commas, so the import of customer addresses is corrupted. Make the tests in tests/test_csvlite.py pass (run them with `python3 -m unittest discover -s tests`). Do not edit the tests.",
+  "verify": "python3 -m unittest discover -s tests -v"
+}

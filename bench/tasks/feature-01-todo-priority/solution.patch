@@ -1,0 +1,38 @@
+diff --git a/src/priority.test.ts b/src/priority.test.ts
+new file mode 100644
+index 0000000..36911f0
+--- /dev/null
++++ b/src/priority.test.ts
+@@ -0,0 +1,7 @@
++import { expect, test } from "bun:test"
++import { addTodo, sortByPriority } from "./todo"
++
++test("sortByPriority puts high first", () => {
++  const list = addTodo(addTodo([], "a", "low"), "b", "high")
++  expect(sortByPriority(list).map((todo) => todo.title)).toEqual(["b", "a"])
++})
+diff --git a/src/todo.ts b/src/todo.ts
+index c239f72..e0d9b69 100644
+--- a/src/todo.ts
++++ b/src/todo.ts
+@@ -1,11 +1,17 @@
+-export type Todo = { id: number; title: string; done: boolean }
++export type Priority = "low" | "normal" | "high"
++export type Todo = { id: number; title: string; done: boolean; priority: Priority }
+ 
+ let nextId = 1
++const RANK: Record<Priority, number> = { high: 0, normal: 1, low: 2 }
+ 
+-export function addTodo(list: Todo[], title: string): Todo[] {
+-  return [...list, { id: nextId++, title, done: false }]
++export function addTodo(list: Todo[], title: string, priority: Priority = "normal"): Todo[] {
++  return [...list, { id: nextId++, title, done: false, priority }]
+ }
+ 
+ export function complete(list: Todo[], id: number): Todo[] {
+   return list.map((todo) => (todo.id === id ? { ...todo, done: true } : todo))
+ }
++
++export function sortByPriority(list: Todo[]): Todo[] {
++  return [...list].sort((a, b) => Number(a.done) - Number(b.done) || RANK[a.priority] - RANK[b.priority])
++}

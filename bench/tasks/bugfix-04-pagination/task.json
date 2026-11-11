@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-04-pagination",
+  "category": "bugfix",
+  "lang": "en",
+  "title": "Pagination skips the first page and drops the last one (Go)",
+  "prompt": "Users report that the product list skips the first 4 products and the last page never shows up. The tests in paginate/paginate_test.go fail (`go test ./...`). Fix the bug (pages are 1-based) without changing the tests.",
+  "verify": "GOTOOLCHAIN=local GOFLAGS=-mod=mod go test ./... "
+}

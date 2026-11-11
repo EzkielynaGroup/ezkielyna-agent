@@ -1,0 +1,21 @@
+{
+  "id": "qa-04-callers-formatprice",
+  "category": "qa",
+  "lang": "en",
+  "title": "Which callers break if formatPrice changes",
+  "prompt": "We want to add a required `currency` parameter to `formatPrice` in src/money.ts. Which functions would break? List every function that calls it, with its file. Do not change any code.",
+  "keywords": [
+    [
+      "cartSummary"
+    ],
+    [
+      "invoiceLine"
+    ],
+    [
+      "receiptEmail"
+    ],
+    [
+      "receipt.ts"
+    ]
+  ]
+}

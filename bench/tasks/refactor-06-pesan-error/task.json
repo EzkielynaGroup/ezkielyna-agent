@@ -1,0 +1,8 @@
+{
+  "id": "refactor-06-pesan-error",
+  "category": "refactor",
+  "lang": "id",
+  "title": "Kumpulkan pesan error ke satu file",
+  "prompt": "Pesan error di src/akun.ts, src/transfer.ts dan src/pin.ts ditulis langsung di dalam kode. Kumpulkan semuanya ke file baru src/pesan.ts sebagai objek `PESAN` yang diekspor (misalnya `PESAN.saldoKurang`), lalu pakai objek itu di ketiga file. Teks pesannya harus sama persis seperti sekarang, dan test yang ada harus tetap lulus.",
+  "verify": "bun test src && bun .verify/check.ts"
+}

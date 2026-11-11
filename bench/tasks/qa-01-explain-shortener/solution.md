@@ -1,0 +1,3 @@
+- **Codes** (`src/codes.ts`): every new link gets the next value of a sequential counter (`LinkStore.nextId()`, starting at 1000), which is encoded in base62 (0-9, a-z, A-Z).
+- **Storage** (`src/store.ts`): links live in an in-memory `Map`; the store writes `links.json` (counter + links) after every 20 writes (`FLUSH_EVERY = 20`), and reloads it on start. Links added since the last flush are lost on a crash.
+- **Abuse protection** (`src/ratelimit.ts`): a token bucket per client IP, capacity 10, refilled at 10 requests per minute; when empty the server answers 429.

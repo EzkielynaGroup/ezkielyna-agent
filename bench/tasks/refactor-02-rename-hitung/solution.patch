@@ -1,0 +1,56 @@
+diff --git a/checkout/checkout.go b/checkout/checkout.go
+index e1a16a0..8decc57 100644
+--- a/checkout/checkout.go
++++ b/checkout/checkout.go
+@@ -3,5 +3,5 @@ package checkout
+ import "example.com/toko/ongkir"
+ 
+ func Total(subtotal, beratGram int, tujuan ongkir.Tujuan) int {
+-	return subtotal + ongkir.Hitung(beratGram, tujuan)
++	return subtotal + ongkir.HitungOngkir(beratGram, tujuan)
+ }
+diff --git a/estimasi/estimasi.go b/estimasi/estimasi.go
+index 0b34f35..8bacdce 100644
+--- a/estimasi/estimasi.go
++++ b/estimasi/estimasi.go
+@@ -6,7 +6,7 @@ import "example.com/toko/ongkir"
+ func Termurah(beratGram int) int {
+ 	murah := -1
+ 	for _, t := range []ongkir.Tujuan{ongkir.Jawa, ongkir.Sumatra, ongkir.Kalimantan, ongkir.Lainnya} {
+-		if biaya := ongkir.Hitung(beratGram, t); murah < 0 || biaya < murah {
++		if biaya := ongkir.HitungOngkir(beratGram, t); murah < 0 || biaya < murah {
+ 			murah = biaya
+ 		}
+ 	}
+diff --git a/ongkir/ongkir.go b/ongkir/ongkir.go
+index f796d62..c1743e2 100644
+--- a/ongkir/ongkir.go
++++ b/ongkir/ongkir.go
+@@ -11,8 +11,8 @@ const (
+ 
+ var tarif = map[Tujuan]int{Jawa: 9000, Sumatra: 15000, Kalimantan: 18000, Lainnya: 25000}
+ 
+-// Hitung mengembalikan ongkos kirim: tarif per kg tujuan, berat dibulatkan ke atas, minimal 1 kg.
+-func Hitung(beratGram int, tujuan Tujuan) int {
++// HitungOngkir mengembalikan ongkos kirim: tarif per kg tujuan, berat dibulatkan ke atas, minimal 1 kg.
++func HitungOngkir(beratGram int, tujuan Tujuan) int {
+ 	kg := (beratGram + 999) / 1000
+ 	if kg < 1 {
+ 		kg = 1
+diff --git a/ongkir/ongkir_test.go b/ongkir/ongkir_test.go
+index 5edd224..2878a1e 100644
+--- a/ongkir/ongkir_test.go
++++ b/ongkir/ongkir_test.go
+@@ -3,10 +3,10 @@ package ongkir
+ import "testing"
+ 
+ func TestHitung(t *testing.T) {
+-	if got := Hitung(1500, Jawa); got != 18000 {
++	if got := HitungOngkir(1500, Jawa); got != 18000 {
+ 		t.Fatalf("got %d", got)
+ 	}
+-	if got := Hitung(200, Sumatra); got != 15000 {
++	if got := HitungOngkir(200, Sumatra); got != 15000 {
+ 		t.Fatalf("got %d", got)
+ 	}
+ }

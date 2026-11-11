@@ -1,0 +1,15 @@
+# `bun test` for this package never renders Solid JSX (that is what Playwright is for); it only needs the
+# .tsx modules in the import graph to load. tsconfig.json has `jsx: preserve` + `jsxImportSource: solid-js`,
+# which Bun 1.3 turned into the classic runtime (calls that were never executed) but Bun 1.4 turns into the
+# automatic dev runtime: `import { jsxDEV } from "solid-js/jsx-dev-runtime"`. solid-js ships that subpath for
+# types only (it resolves to dist/solid.js, which exports no jsx/jsxs/jsxDEV), so every test file that touches
+# a component failed to link with "Export named 'jsxDEV' not found". Pin the classic runtime for Bun explicitly.
+# Vite (vite-plugin-solid) and tsc/tsgo do not read this file. Rendering JSX under `bun test` would need the
+# babel-preset-solid transform; until then it fails with the descriptive ReferenceError below.
+jsx = "react"
+jsxFactory = "SolidJsxIsNotCompiledByBunTest"
+jsxFragment = "SolidJsxIsNotCompiledByBunTest"
+
+[test]
+root = "./src"
+preload = ["./happydom.ts"]

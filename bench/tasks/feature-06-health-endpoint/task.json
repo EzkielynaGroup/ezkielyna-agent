@@ -1,0 +1,8 @@
+{
+  "id": "feature-06-health-endpoint",
+  "category": "feature",
+  "lang": "id",
+  "title": "Endpoint /health dan 404 JSON",
+  "prompt": "Router API di src/router.ts perlu dua perubahan: (1) tambahkan `GET /health` yang membalas status 200 dengan JSON `{\"status\":\"ok\",\"versi\":<VERSI dari src/versi.ts>}`; (2) rute yang tidak dikenal harus membalas status 404 dengan JSON `{\"error\":\"tidak ditemukan\"}` (sekarang masih teks biasa). Method selain GET di /health harus 405. Tambahkan test untuk /health.",
+  "verify": "bun test src && grep -rl --include='*.test.ts' -e '/health' src | grep -v bench_hidden | grep -q ."
+}

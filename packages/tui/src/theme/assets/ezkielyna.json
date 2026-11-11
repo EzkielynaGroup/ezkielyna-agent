@@ -1,0 +1,235 @@
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "defs": {
+    "lBg": "#faf8f4",
+    "lPanel": "#f5f0e8",
+    "lElem": "#f2ece3",
+    "lBorder": "#e4dbcf",
+    "lBorderSoft": "#ebe4da",
+    "lBorderAct": "#b25e43",
+    "lText": "#1f1a17",
+    "lMuted": "#6f6a62",
+    "lPrimary": "#b25e43",
+    "lInk": "#9a4c33",
+    "lOk": "#286a4e",
+    "lWarn": "#87530b",
+    "lErr": "#b23a3a",
+    "lInfo": "#3d6a9a",
+    "dBg": "#141110",
+    "dPanel": "#1d1917",
+    "dElem": "#26211e",
+    "dBorder": "#3a322d",
+    "dBorderSoft": "#2e2824",
+    "dBorderAct": "#e08a6c",
+    "dText": "#f3eee9",
+    "dMuted": "#8f8a82",
+    "dPrimary": "#e08a6c",
+    "dInk": "#f0a487",
+    "dOk": "#6fbf9b",
+    "dWarn": "#d9a24a",
+    "dErr": "#e26a6a",
+    "dInfo": "#7fa6c9"
+  },
+  "theme": {
+    "primary": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "secondary": {
+      "dark": "dInk",
+      "light": "lInk"
+    },
+    "accent": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "error": {
+      "dark": "dErr",
+      "light": "lErr"
+    },
+    "warning": {
+      "dark": "dWarn",
+      "light": "lWarn"
+    },
+    "success": {
+      "dark": "dOk",
+      "light": "lOk"
+    },
+    "info": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "text": {
+      "dark": "dText",
+      "light": "lText"
+    },
+    "textMuted": {
+      "dark": "dMuted",
+      "light": "lMuted"
+    },
+    "background": {
+      "dark": "dBg",
+      "light": "lBg"
+    },
+    "backgroundPanel": {
+      "dark": "dPanel",
+      "light": "lPanel"
+    },
+    "backgroundElement": {
+      "dark": "dElem",
+      "light": "lElem"
+    },
+    "border": {
+      "dark": "dBorder",
+      "light": "lBorder"
+    },
+    "borderActive": {
+      "dark": "dBorderAct",
+      "light": "lBorderAct"
+    },
+    "borderSubtle": {
+      "dark": "dBorderSoft",
+      "light": "lBorderSoft"
+    },
+    "diffAdded": {
+      "dark": "#6fbf9b",
+      "light": "#286a4e"
+    },
+    "diffRemoved": {
+      "dark": "#e26a6a",
+      "light": "#b23a3a"
+    },
+    "diffContext": {
+      "dark": "#8f8a82",
+      "light": "#6f6a62"
+    },
+    "diffHunkHeader": {
+      "dark": "#8f8a82",
+      "light": "#6f6a62"
+    },
+    "diffHighlightAdded": {
+      "dark": "#8fd4b2",
+      "light": "#1f5a41"
+    },
+    "diffHighlightRemoved": {
+      "dark": "#ee8a8a",
+      "light": "#8f2f2f"
+    },
+    "diffAddedBg": {
+      "dark": "#1b2a23",
+      "light": "#dcebe0"
+    },
+    "diffRemovedBg": {
+      "dark": "#2e1b1a",
+      "light": "#f4dddb"
+    },
+    "diffContextBg": {
+      "dark": "dPanel",
+      "light": "lPanel"
+    },
+    "diffLineNumber": {
+      "dark": "#8f8a82",
+      "light": "#6f6a62"
+    },
+    "diffAddedLineNumberBg": {
+      "dark": "#16231d",
+      "light": "#cfe3d4"
+    },
+    "diffRemovedLineNumberBg": {
+      "dark": "#271615",
+      "light": "#ecc9c6"
+    },
+    "markdownText": {
+      "dark": "dText",
+      "light": "lText"
+    },
+    "markdownHeading": {
+      "dark": "dInk",
+      "light": "lInk"
+    },
+    "markdownLink": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "markdownLinkText": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "markdownCode": {
+      "dark": "dOk",
+      "light": "lOk"
+    },
+    "markdownBlockQuote": {
+      "dark": "dWarn",
+      "light": "lWarn"
+    },
+    "markdownEmph": {
+      "dark": "dWarn",
+      "light": "lWarn"
+    },
+    "markdownStrong": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "markdownHorizontalRule": {
+      "dark": "dMuted",
+      "light": "lMuted"
+    },
+    "markdownListItem": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "markdownListEnumeration": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "markdownImage": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "markdownImageText": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "markdownCodeBlock": {
+      "dark": "dText",
+      "light": "lText"
+    },
+    "syntaxComment": {
+      "dark": "dMuted",
+      "light": "lMuted"
+    },
+    "syntaxKeyword": {
+      "dark": "dInk",
+      "light": "lInk"
+    },
+    "syntaxFunction": {
+      "dark": "dPrimary",
+      "light": "lPrimary"
+    },
+    "syntaxVariable": {
+      "dark": "dErr",
+      "light": "lErr"
+    },
+    "syntaxString": {
+      "dark": "dOk",
+      "light": "lOk"
+    },
+    "syntaxNumber": {
+      "dark": "dWarn",
+      "light": "lWarn"
+    },
+    "syntaxType": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "syntaxOperator": {
+      "dark": "dInfo",
+      "light": "lInfo"
+    },
+    "syntaxPunctuation": {
+      "dark": "dText",
+      "light": "lText"
+    }
+  }
+}

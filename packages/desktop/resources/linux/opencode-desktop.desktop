@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Ezkielyna Agent
+Exec="/opt/Ezkielyna Agent/store.ezkielyna.agent" %U
+Terminal=false
+Type=Application
+Icon=store.ezkielyna.agent
+StartupWMClass=store.ezkielyna.agent
+NoDisplay=true
+Comment=AI coding agent for Ezkielyna API
+Categories=Development;

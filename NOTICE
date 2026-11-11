@@ -1,0 +1,28 @@
+Ezkielyna Agent
+Copyright (c) 2026 Ezekiel Lieberhart (Ezkielyna)
+
+Based on OpenCode (MIT), (c) its authors.
+OpenCode: https://github.com/anomalyco/opencode  (see LICENSE, Copyright (c) 2025 opencode)
+Ezkielyna Agent is an independent project. It is not affiliated with, sponsored by or endorsed by the
+OpenCode / SST / Anomaly team. "OpenCode" is used here only to name the upstream project.
+
+Ezkielyna Agent is a rebrand of OpenCode that is preconfigured for the Ezkielyna API gateway. All upstream
+copyright notices and licenses (including those of bundled dependencies and packages/ui, packages/http-recorder
+and packages/docs) remain in force. Ezkielyna does not claim ownership of OpenCode or of any AI model that is
+reachable through the gateway.
+
+Ezkielyna Agent v0.9 speed modules (packages/core/src/ezk/speed): the stream-watchdog and deferred tool-disclosure
+ideas are adapted from MiniMax Code (MIT, Copyright (c) 2026 MiniMax Code) and re-implemented for this codebase.
+
+Ezkielyna Agent v3 `/review` (packages/core/src/ezk/review): the review rubric (P0-P3 priorities, "only discrete, actionable
+problems the change introduces", file:line citations, overall verdict) is adapted from the review rubric of OpenAI Codex CLI
+(https://github.com/openai/codex, Apache License 2.0, Copyright OpenAI) and re-written for this codebase. Apache License 2.0 text: LICENSES/Apache-2.0.txt.
+
+Ezkielyna Agent v3 sandbox (packages/core/src/ezk/sandbox/seatbelt.ts): the macOS Seatbelt profile and the
+sandbox escalation protocol (sandbox_permissions "with_network" / "require_escalated" plus a justification) are
+adapted from OpenAI Codex (https://github.com/openai/codex, the codex-rs Seatbelt policies
+seatbelt_base_policy.sbpl, seatbelt_network_policy.sbpl and seatbelt.rs), licensed under the Apache License,
+Version 2.0, Copyright OpenAI. A copy of the license is at
+https://www.apache.org/licenses/LICENSE-2.0 (copy in LICENSES/Apache-2.0.txt). Changes: re-implemented in TypeScript, protected folders (.git,
+.ezkielyna, .claude, .codex, .agents, .ssh, .aws) excluded from every writable root, network section generated only
+when the user approves network access.

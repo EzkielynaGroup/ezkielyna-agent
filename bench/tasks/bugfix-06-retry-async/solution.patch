@@ -1,0 +1,13 @@
+diff --git a/src/retry.ts b/src/retry.ts
+index 8f97051..8ad3af7 100644
+--- a/src/retry.ts
++++ b/src/retry.ts
+@@ -3,7 +3,7 @@ export async function denganUlang<T>(fn: () => Promise<T>, maksUlang = 3, jedaMs
+   let percobaan = 0
+   while (true) {
+     try {
+-      return fn()
++      return await fn()
+     } catch (err) {
+       percobaan++
+       if (percobaan > maksUlang) throw err

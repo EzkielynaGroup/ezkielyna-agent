@@ -1,0 +1,8 @@
+{
+  "id": "refactor-02-rename-hitung",
+  "category": "refactor",
+  "lang": "id",
+  "title": "Ganti nama fungsi Hitung menjadi HitungOngkir (Go)",
+  "prompt": "Nama fungsi `Hitung` di paket ongkir (ongkir/ongkir.go) terlalu umum. Ganti namanya menjadi `HitungOngkir` di seluruh proyek: definisi, semua pemanggil di paket lain, dan test. Jangan sisakan fungsi dengan nama lama, dan perilakunya tidak boleh berubah. Cek dengan `go test ./...`.",
+  "verify": "GOTOOLCHAIN=local GOFLAGS=-mod=mod go test ./... && python3 .verify/check.py"
+}

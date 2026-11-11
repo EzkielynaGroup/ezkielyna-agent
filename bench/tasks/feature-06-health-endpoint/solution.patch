@@ -1,0 +1,34 @@
+diff --git a/src/health.test.ts b/src/health.test.ts
+new file mode 100644
+index 0000000..b157cad
+--- /dev/null
++++ b/src/health.test.ts
+@@ -0,0 +1,6 @@
++import { expect, test } from "bun:test"
++import { handle } from "./router"
++
++test("/health", async () => {
++  expect((await handle(new Request("http://x/health"))).status).toBe(200)
++})
+diff --git a/src/router.ts b/src/router.ts
+index 8d03f49..3b05872 100644
+--- a/src/router.ts
++++ b/src/router.ts
+@@ -1,3 +1,5 @@
++import { VERSI } from "./versi"
++
+ const PRODUK = [
+   { id: 1, nama: "Kopi Gayo 250g", harga: 85000 },
+   { id: 2, nama: "Teh Tubruk", harga: 22000 },
+@@ -5,6 +7,10 @@ const PRODUK = [
+ 
+ export async function handle(req: Request): Promise<Response> {
+   const url = new URL(req.url)
++  if (url.pathname === "/health") {
++    if (req.method !== "GET") return Response.json({ error: "method tidak diizinkan" }, { status: 405 })
++    return Response.json({ status: "ok", versi: VERSI })
++  }
+   if (req.method === "GET" && url.pathname === "/produk") return Response.json(PRODUK)
+-  return new Response("Not Found", { status: 404 })
++  return Response.json({ error: "tidak ditemukan" }, { status: 404 })
+ }

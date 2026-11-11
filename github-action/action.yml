@@ -1,0 +1,108 @@
+name: Ezkielyna Agent
+description: Review a pull request or propose a fix for a failing CI job with Ezkielyna Agent.
+author: Ezkielyna
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  api-key:
+    description: Your Ezkielyna API key. Store it as a repository secret and pass it as ${{ secrets.EZKIELYNA_API_KEY }}.
+    required: true
+  mode:
+    description: "review (comment on the pull request), fix-ci (open a draft pull request with a fix) or custom (run `prompt`)."
+    required: false
+    default: custom
+  prompt:
+    description: The task for mode custom. For review and fix-ci it is optional extra context from the maintainer.
+    required: false
+    default: ""
+  model:
+    description: Model name, or ezk-auto to let the router choose.
+    required: false
+    default: ezk-auto
+  max-budget:
+    description: Stop when the run costs more than this many US dollars.
+    required: false
+    default: "0.50"
+  max-turns:
+    description: Stop after this many model turns (1 to 500). Empty means the CLI default.
+    required: false
+    default: ""
+  permission-mode:
+    description: "ask, plan, acceptEdits or safeAuto. Default: acceptEdits for fix-ci, plan otherwise."
+    required: false
+    default: ""
+  version:
+    description: Agent version to install, or latest.
+    required: false
+    default: latest
+  github-token:
+    description: Token used to comment on the pull request (review) or to open the draft pull request (fix-ci).
+    required: false
+    default: ${{ github.token }}
+  log-file:
+    description: fix-ci only. A file with the failing job log. When empty, the failed jobs of `run-id` are downloaded.
+    required: false
+    default: ""
+  trust-project:
+    description: "fix-ci only. DANGEROUS, default false. When false, the project config of the checked-out branch (ezkielyna.json*, .ezkielyna/, .mcp.json and the legacy-named config files and folders) is reset to the default branch before the agent runs. Set true only if you accept that the checked-out branch's plugins and MCP servers run with your API key."
+    required: false
+    default: "false"
+  run-id:
+    description: fix-ci only. The workflow run that failed. Defaults to the triggering run (workflow_run event) or the current run.
+    required: false
+    default: ""
+
+outputs:
+  result:
+    description: The final message of the agent.
+    value: ${{ steps.run.outputs.result }}
+  cost-usd:
+    description: Cost of the run in US dollars (empty when the CLI did not report one).
+    value: ${{ steps.run.outputs.cost-usd }}
+  turns:
+    description: Number of model turns.
+    value: ${{ steps.run.outputs.turns }}
+  exit-code:
+    description: Exit code of `ezkielyna exec` (0 ok, 1 error, 2 budget or turn limit, 3 action denied).
+    value: ${{ steps.run.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check runner
+      shell: bash
+      run: |
+        if [ "${EZK_ACTION_DRY_RUN:-}" != "1" ] && [ "$RUNNER_OS" != "Linux" ]; then
+          echo "::error title=Ezkielyna Agent::This action runs on Linux runners only (ubuntu-latest). This runner is $RUNNER_OS."
+          exit 1
+        fi
+        command -v node >/dev/null || { echo "::error title=Ezkielyna Agent::node is required on the runner."; exit 1; }
+
+    - name: Install Ezkielyna Agent
+      shell: bash
+      env:
+        EZK_VERSION: ${{ inputs.version }}
+      run: bash "${{ github.action_path }}/scripts/install.sh"
+
+    - name: Run Ezkielyna Agent
+      id: run
+      shell: bash
+      env:
+        EZK_INPUT_API_KEY: ${{ inputs.api-key }}
+        EZK_INPUT_MODE: ${{ inputs.mode }}
+        EZK_INPUT_PROMPT: ${{ inputs.prompt }}
+        EZK_INPUT_MODEL: ${{ inputs.model }}
+        EZK_INPUT_MAX_BUDGET: ${{ inputs.max-budget }}
+        EZK_INPUT_MAX_TURNS: ${{ inputs.max-turns }}
+        EZK_INPUT_PERMISSION_MODE: ${{ inputs.permission-mode }}
+        EZK_INPUT_VERSION: ${{ inputs.version }}
+        EZK_INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        EZK_INPUT_LOG_FILE: ${{ inputs.log-file }}
+        EZK_INPUT_RUN_ID: ${{ inputs.run-id }}
+        EZK_INPUT_TRUST_PROJECT: ${{ inputs.trust-project }}
+      run: |
+        # Mask before anything can print it.
+        if [ -n "$EZK_INPUT_API_KEY" ]; then echo "::add-mask::$EZK_INPUT_API_KEY"; fi
+        node "${{ github.action_path }}/scripts/run.mjs"

@@ -1,0 +1,36 @@
+# Copy to .github/workflows/ezkielyna-fix-ci.yml in YOUR repository.
+# When the workflow named below fails, the agent reads the failed job log and opens a DRAFT pull request with a proposed
+# fix on a new branch (ezkielyna/fix-ci-...). It never pushes to the failing branch or to the default branch.
+# Also enable: Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+name: ezkielyna fix ci
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write        # push the new fix branch
+  pull-requests: write   # open the draft pull request
+  actions: read          # read the failed job log
+
+jobs:
+  fix:
+    # Only for failed runs of branches in this repository (never for forks).
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false   # keep the repo token out of .git/config, where the agent could read it
+      - uses: ezkielyna/agent-action@v1.0.0
+        with:
+          api-key: ${{ secrets.EZKIELYNA_API_KEY }}
+          mode: fix-ci
+          run-id: ${{ github.event.workflow_run.id }}
+          max-budget: "1.00"
+          max-turns: "40"
+          version: 1.19.3-ezk.3

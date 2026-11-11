@@ -1,0 +1,196 @@
+name: build-target
+
+# One platform of build.yml: build the CLI (and optionally the desktop app), smoke-test what was
+# built, upload it with SHA256SUMS. Called by build.yml only; unsigned, no secrets, never publishes.
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: Artefact/platform name, e.g. linux-x64
+        type: string
+        required: true
+      runner:
+        type: string
+        required: true
+      timeout:
+        description: Job timeout in minutes
+        type: number
+        required: true
+      cli:
+        description: Directory under packages/opencode/dist that script/build.ts --single writes
+        type: string
+        required: true
+      desktop:
+        description: electron-builder platform/target arguments; empty skips the desktop app
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  # "prod" gives the desktop app its release app id/name and keeps prebuild from downloading the
+  # upstream dev CLI sidecar; the CLI treats it as a release channel too (opencode.db, no dev plugins).
+  OPENCODE_CHANNEL: prod
+  # The Vite builds (embedded web UI, desktop renderer) run under Node and need more than its default heap.
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  build:
+    name: ${{ inputs.name }}
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: ${{ inputs.timeout }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+
+      - name: Read Bun version and build version
+        id: meta
+        env:
+          # On pull requests GITHUB_SHA is the temporary merge commit; name artefacts after the PR head instead.
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          echo "bun=$(node -p "require('./package.json').packageManager.split('@')[1]")" >> "$GITHUB_OUTPUT"
+          version=$(node -p "require('./packages/desktop/package.json').version")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${HEAD_SHA::7}" >> "$GITHUB_OUTPUT"
+          # Same version for the CLI (--version, user agent) as for the desktop package.
+          echo "OPENCODE_VERSION=$version" >> "$GITHUB_ENV"
+          # Pin Bun's package cache to ~/.bun/install/cache on every OS so the cache step below matches it.
+          cache="$HOME/.bun/install/cache"
+          if [ "$RUNNER_OS" = "Windows" ]; then cache=$(cygpath -w "$cache"); fi
+          echo "BUN_INSTALL_CACHE_DIR=$cache" >> "$GITHUB_ENV"
+
+      - name: Setup Bun ${{ steps.meta.outputs.bun }}
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ steps.meta.outputs.bun }}
+
+      - name: Restore Bun package cache
+        id: bun-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-
+
+      - name: Free disk space on the Linux runner
+        # The desktop build leaves the unpacked app plus tar.gz, AppImage and deb next to a full node_modules, and the smoke
+        # test unpacks each of them again; one run warned of 62 MB free on the 14 GB the image leaves. These preinstalled
+        # toolchains are not used by this job.
+        if: runner.os == 'Linux'
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Install Linux packages for the desktop smoke test
+        if: runner.os == 'Linux' && inputs.desktop != ''
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libnss3 libgbm1 libasound2t64 libgtk-3-0t64 dpkg >/dev/null
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Save Bun package cache
+        # Saved right after install instead of in a post step, so a later failing step (tests, smoke) does not
+        # throw the cache away.
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ steps.bun-cache.outputs.cache-primary-key }}
+
+      - name: Build CLI
+        working-directory: packages/opencode
+        run: bun run script/build.ts --single
+
+      - name: Smoke test CLI
+        run: bun scripts/ci/smoke-cli.ts "packages/opencode/dist/${{ inputs.cli }}/bin/ezkielyna${{ runner.os == 'Windows' && '.exe' || '' }}"
+
+      - name: Build desktop
+        if: inputs.desktop != ''
+        working-directory: packages/desktop
+        run: |
+          bun run prebuild
+          bun run build
+
+      - name: Package desktop (unsigned)
+        if: inputs.desktop != ''
+        working-directory: packages/desktop
+        run: bunx electron-builder --config ../../scripts/ci/electron-builder.ci.ts ${{ inputs.desktop }} --publish never
+
+      - name: Smoke test desktop packages
+        if: inputs.desktop != ''
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            df -h /
+            # xvfb-run exports DISPLAY and XAUTHORITY; scripts/ci/safe-env.ts must keep both for the app to reach the X server.
+            status=0
+            xvfb-run -a bun scripts/ci/verify_packaged.ts packages/desktop/dist || status=$?
+            df -h /
+            exit "$status"
+          else
+            bun scripts/ci/verify_packaged.ts packages/desktop/dist
+          fi
+
+      - name: Collect artefacts
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          SHORT_SHA: ${{ steps.meta.outputs.short_sha }}
+          NAME: ${{ inputs.name }}
+          DESKTOP: ${{ inputs.desktop }}
+        run: |
+          mkdir -p artifacts
+          bin="packages/opencode/dist/${{ inputs.cli }}/bin"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            cp "$bin/ezkielyna.exe" "artifacts/ezkielyna-cli-$VERSION-$NAME.exe"
+          else
+            # tar keeps the executable bit, which the artifact zip would drop.
+            tar -czf "artifacts/ezkielyna-cli-$VERSION-$NAME.tar.gz" -C "$bin" ezkielyna
+          fi
+          if [ -n "$DESKTOP" ]; then
+            find packages/desktop/dist -maxdepth 1 -type f -name 'ezkielyna-agent-*' \
+              \( -name '*.AppImage' -o -name '*.deb' -o -name '*.tar.gz' -o -name '*.exe' -o -name '*.zip' \) \
+              -exec cp {} artifacts/ \;
+          fi
+          bun scripts/ci/sha256sums.ts artifacts
+          ls -l artifacts
+          {
+            echo "### $NAME ($VERSION, $SHORT_SHA)"
+            echo
+            echo "| File | Size (MB) |"
+            echo "|---|---|"
+            find artifacts -maxdepth 1 -type f ! -name SHA256SUMS | sort | while read -r file; do
+              echo "| $(basename "$file") | $(( $(wc -c < "$file") / 1000000 )) |"
+            done
+            echo
+            echo '```'
+            cat artifacts/SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artefacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ezkielyna-${{ inputs.name }}-${{ steps.meta.outputs.short_sha }}
+          path: artifacts/
+          if-no-files-found: error
+          # Short on purpose: one full run is about 1.1 GB and the account's Actions storage quota filled up (uploads then fail with
+          # "Artifact storage quota has been hit"). Download what you need within 3 days; re-run to rebuild.
+          retention-days: 3
+          # Everything in here is already compressed (tar.gz, AppImage, deb, zip, PE).
+          compression-level: 0

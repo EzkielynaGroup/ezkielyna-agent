@@ -1,0 +1,17 @@
+diff --git a/src/slug.ts b/src/slug.ts
+index 8435815..70bb75c 100644
+--- a/src/slug.ts
++++ b/src/slug.ts
+@@ -1,8 +1,9 @@
+ /** URL slug: lowercase ASCII letters and digits separated by single dashes. */
+ export function slugify(title: string): string {
+   return title
++    .normalize("NFKD")
++    .replace(/[\u0300-\u036f]/g, "")
+     .toLowerCase()
+-    .trim()
+-    .replace(/ /g, "-")
+-    .replace(/[^a-z0-9-]/g, "")
++    .replace(/[^a-z0-9]+/g, "-")
++    .replace(/^-+|-+$/g, "")
+ }

@@ -1,0 +1,33 @@
+# Copy to .github/workflows/ezkielyna-review.yml in YOUR repository.
+# Needs the repository secret EZKIELYNA_API_KEY (Settings > Secrets and variables > Actions).
+name: ezkielyna review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Minimal permissions: read the code, write one pull request comment.
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ezkielyna-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # Pull requests from forks do not get secrets; skip them instead of failing.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ezkielyna/agent-action@v1.0.0
+        with:
+          api-key: ${{ secrets.EZKIELYNA_API_KEY }}
+          mode: review
+          max-budget: "0.50"
+          version: 1.19.3-ezk.3

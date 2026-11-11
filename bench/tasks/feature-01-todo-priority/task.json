@@ -1,0 +1,8 @@
+{
+  "id": "feature-01-todo-priority",
+  "category": "feature",
+  "lang": "en",
+  "title": "Todo priorities and sorting",
+  "prompt": "Add priorities to the todo module in src/todo.ts: `addTodo(list, title, priority?)` where priority is \"low\" | \"normal\" | \"high\" (default \"normal\"), and a new exported function `sortByPriority(list)` that returns a NEW array ordered high > normal > low, keeping the original order within the same priority, with completed todos always at the end. Write tests for the new behaviour.",
+  "verify": "bun test src && grep -rl --include='*.test.ts' -e 'sortByPriority' src | grep -v bench_hidden | grep -q ."
+}

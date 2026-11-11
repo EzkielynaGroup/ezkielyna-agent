@@ -1,0 +1,8 @@
+{
+  "id": "refactor-03-callbacks-to-async",
+  "category": "refactor",
+  "lang": "en",
+  "title": "Convert callback APIs to async/await",
+  "prompt": "src/store.ts and src/settings.ts use Node-style callbacks. Convert them to promise-based async functions: `readJson(file): Promise<unknown>`, `writeJson(file, data): Promise<void>`, `loadSettings(file): Promise<Settings>` and `saveSettings(file, settings): Promise<void>`. Remove the callback parameters entirely and update the tests accordingly. Keep the defaults behaviour of loadSettings (missing file -> defaults).",
+  "verify": "bun test src && bun .verify/check.ts"
+}

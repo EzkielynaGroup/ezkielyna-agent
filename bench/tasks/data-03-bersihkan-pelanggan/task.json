@@ -1,0 +1,8 @@
+{
+  "id": "data-03-bersihkan-pelanggan",
+  "category": "data",
+  "lang": "en",
+  "title": "Clean a messy customer CSV",
+  "prompt": "customers.csv is messy. Write a cleaned copy to customers_clean.csv: trim names, collapse repeated spaces and convert them to Title Case; lowercase emails; remove duplicates by email, keeping the row with the earliest signup; normalise signup_date to ISO YYYY-MM-DD (the input mixes YYYY-MM-DD, DD/MM/YYYY and '5 Jan 2026'); sort by signup_date, then email. Keep the header name,email,signup_date.",
+  "verify": "python3 .verify/check.py"
+}

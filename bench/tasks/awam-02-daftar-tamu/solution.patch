@@ -1,0 +1,11 @@
+diff --git a/daftar_tamu.txt b/daftar_tamu.txt
+new file mode 100644
+index 0000000..917f43e
+--- /dev/null
++++ b/daftar_tamu.txt
+@@ -0,0 +1,5 @@
++1. Ahmad
++2. Budi Santoso
++3. Dewi Lestari
++4. Rina Marlina
++5. Siti Aminah

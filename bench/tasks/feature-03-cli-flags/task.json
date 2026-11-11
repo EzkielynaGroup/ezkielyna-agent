@@ -1,0 +1,8 @@
+{
+  "id": "feature-03-cli-flags",
+  "category": "feature",
+  "lang": "en",
+  "title": "Add --lines and --chars to a small CLI",
+  "prompt": "wc.ts is a tiny CLI (`bun wc.ts <file>` prints `<n> words`). Add two flags: `--lines` prints `<n> lines` and `--chars` prints `<n> chars` (characters, not bytes; count newlines too). Flags can come before or after the file name; with no flag it keeps printing words. Unknown flags must exit with code 2 and a message on stderr. Add tests for the new flags.",
+  "verify": "bun test && grep -rl --include='*.test.ts' -e '--lines' . | grep -v bench_hidden | grep -q ."
+}

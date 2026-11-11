@@ -1,0 +1,24 @@
+{
+  "id": "qa-03-alur-data-laporan",
+  "category": "qa",
+  "lang": "mix",
+  "title": "Alur data dari upload CSV sampai laporan",
+  "prompt": "Jelaskan alur data di repo ini dari file CSV yang di-upload sampai laporan HTML jadi. Sebutkan urutan fungsi yang dipanggil dan di file mana, and explain what happens to rows that fail validation. Jawab singkat, boleh pakai bullet.",
+  "keywords": [
+    [
+      "parseCsv"
+    ],
+    [
+      "validasiBaris"
+    ],
+    [
+      "rekapPerBulan"
+    ],
+    [
+      "renderLaporan"
+    ],
+    [
+      "ditolak.csv"
+    ]
+  ]
+}

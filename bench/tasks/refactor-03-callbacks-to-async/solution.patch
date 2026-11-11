@@ -1,0 +1,80 @@
+diff --git a/src/settings.test.ts b/src/settings.test.ts
+index f11dd74..d8d6349 100644
+--- a/src/settings.test.ts
++++ b/src/settings.test.ts
+@@ -4,17 +4,9 @@ import { tmpdir } from "node:os"
+ import path from "node:path"
+ import { loadSettings, saveSettings } from "./settings"
+ 
+-test("round trip with callbacks", (done) => {
++test("round trip", async () => {
+   const file = path.join(mkdtempSync(path.join(tmpdir(), "settings-")), "s.json")
+-  loadSettings(file, (err, initial) => {
+-    expect(err).toBeNull()
+-    expect(initial).toEqual({ theme: "light", fontSize: 14 })
+-    saveSettings(file, { theme: "dark", fontSize: 16 }, (saveErr) => {
+-      expect(saveErr).toBeNull()
+-      loadSettings(file, (_, loaded) => {
+-        expect(loaded).toEqual({ theme: "dark", fontSize: 16 })
+-        done()
+-      })
+-    })
+-  })
++  expect(await loadSettings(file)).toEqual({ theme: "light", fontSize: 14 })
++  await saveSettings(file, { theme: "dark", fontSize: 16 })
++  expect(await loadSettings(file)).toEqual({ theme: "dark", fontSize: 16 })
+ })
+diff --git a/src/settings.ts b/src/settings.ts
+index 7e033fe..7d0cbd5 100644
+--- a/src/settings.ts
++++ b/src/settings.ts
+@@ -3,14 +3,14 @@ import { readJson, writeJson } from "./store"
+ export type Settings = { theme: "light" | "dark"; fontSize: number }
+ export const DEFAULTS: Settings = { theme: "light", fontSize: 14 }
+ 
+-export function loadSettings(file: string, cb: (err: Error | null, settings?: Settings) => void) {
+-  readJson(file, (err, value) => {
+-    if (err && (err as NodeJS.ErrnoException).code === "ENOENT") return cb(null, { ...DEFAULTS })
+-    if (err) return cb(err)
+-    cb(null, { ...DEFAULTS, ...(value as Partial<Settings>) })
++export async function loadSettings(file: string): Promise<Settings> {
++  const value = await readJson(file).catch((err: NodeJS.ErrnoException) => {
++    if (err.code === "ENOENT") return {}
++    throw err
+   })
++  return { ...DEFAULTS, ...(value as Partial<Settings>) }
+ }
+ 
+-export function saveSettings(file: string, settings: Settings, cb: (err: Error | null) => void) {
+-  writeJson(file, settings, (err) => cb(err))
++export async function saveSettings(file: string, settings: Settings): Promise<void> {
++  await writeJson(file, settings)
+ }
+diff --git a/src/store.ts b/src/store.ts
+index d7d65cc..b81716f 100644
+--- a/src/store.ts
++++ b/src/store.ts
+@@ -1,18 +1,9 @@
+-import fs from "node:fs"
++import { readFile, writeFile } from "node:fs/promises"
+ 
+-type Callback<T> = (err: Error | null, value?: T) => void
+-
+-export function readJson(file: string, cb: Callback<unknown>) {
+-  fs.readFile(file, "utf8", (err, text) => {
+-    if (err) return cb(err)
+-    try {
+-      cb(null, JSON.parse(text))
+-    } catch (parseError) {
+-      cb(parseError as Error)
+-    }
+-  })
++export async function readJson(file: string): Promise<unknown> {
++  return JSON.parse(await readFile(file, "utf8"))
+ }
+ 
+-export function writeJson(file: string, data: unknown, cb: Callback<void>) {
+-  fs.writeFile(file, JSON.stringify(data, null, 2), (err) => cb(err ?? null))
++export async function writeJson(file: string, data: unknown): Promise<void> {
++  await writeFile(file, JSON.stringify(data, null, 2))
+ }

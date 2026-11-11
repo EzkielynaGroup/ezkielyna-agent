@@ -1,0 +1,8 @@
+{
+  "id": "data-02-excel-stok",
+  "category": "data",
+  "lang": "mix",
+  "title": "Barang di bawah reorder level dari Excel",
+  "prompt": "Read the Excel file data/inventory.xlsx (sheet \"Stok\") dan buat low_stock.csv berisi barang yang qty-nya di bawah reorder_level. Columns: sku,nama,qty,kekurangan (kekurangan = reorder_level - qty). Urutkan dari kekurangan terbesar; kalau sama, urut sku. Jangan ubah file Excel-nya.",
+  "verify": "python3 .verify/check.py"
+}

@@ -1,0 +1,13 @@
+diff --git a/src/dates.ts b/src/dates.ts
+index 59611c6..7f5f4c1 100644
+--- a/src/dates.ts
++++ b/src/dates.ts
+@@ -5,7 +5,7 @@ export function daysInRange(start: string, end: string): number {
+   const a = Date.parse(start)
+   const b = Date.parse(end)
+   if (b < a) throw new Error("end before start")
+-  return Math.floor((b - a) / DAY)
++  return Math.round((b - a) / DAY) + 1
+ }
+ 
+ /** Nights stayed between check-in and check-out. */

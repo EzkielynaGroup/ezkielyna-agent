@@ -1,0 +1,17 @@
+diff --git a/src/merge.ts b/src/merge.ts
+index 52d1f94..b9b8d2a 100644
+--- a/src/merge.ts
++++ b/src/merge.ts
+@@ -1,10 +1,10 @@
+ export type Obj = Record<string, unknown>
+ 
+-const isObj = (value: unknown): value is Obj => typeof value === "object" && value !== null
++const isObj = (value: unknown): value is Obj => typeof value === "object" && value !== null && !Array.isArray(value)
+ 
+ /** Deep-merges `b` into a copy of `a`. Arrays in `b` replace arrays in `a`. Inputs are never mutated. */
+ export function deepMerge(a: Obj, b: Obj): Obj {
+-  const out = a
++  const out: Obj = { ...a }
+   for (const [key, value] of Object.entries(b)) {
+     out[key] = isObj(value) && isObj(out[key]) ? deepMerge(out[key] as Obj, value) : value
+   }

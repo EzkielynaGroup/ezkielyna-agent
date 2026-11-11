@@ -1,0 +1,8 @@
+{
+  "id": "feature-04-cache-ttl",
+  "category": "feature",
+  "lang": "mix",
+  "title": "TTL untuk cache in-memory (Go)",
+  "prompt": "Cache di cache/cache.go belum punya kedaluwarsa. Add TTL support: `New[K, V](ttl time.Duration, now func() time.Time)` (now == nil means time.Now, so tests can inject a fake clock), `SetTTL(key, value, ttl)` to override the TTL per entry (Set keeps using the default), `Get` returns false for expired entries (dan menghapusnya), and `Len()` only counts entries that are not expired. Update kurs/kurs.go to the new constructor with a 1 minute TTL. Tambahkan test dengan jam palsu (fake clock), cek dengan `go test ./...`.",
+  "verify": "GOTOOLCHAIN=local GOFLAGS=-mod=mod go test ./... && grep -rl --include='*_test.go' -e 'SetTTL' . | grep -v bench_hidden | grep -q ."
+}

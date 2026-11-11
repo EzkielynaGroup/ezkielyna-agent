@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-03-slugify",
+  "category": "bugfix",
+  "lang": "mix",
+  "title": "slugify menghasilkan URL jelek",
+  "prompt": "Fungsi slugify di src/slug.ts menghasilkan URL jelek: ada double dash, dan huruf beraksen (é, ü) malah hilang. Make the failing tests in src/slug.test.ts pass without editing the tests.",
+  "verify": "bun test src"
+}

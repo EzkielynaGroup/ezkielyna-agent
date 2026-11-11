@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-07-deep-merge",
+  "category": "bugfix",
+  "lang": "en",
+  "title": "deepMerge mutates defaults and merges arrays",
+  "prompt": "Our config loader leaks settings between calls: after loading one user's config the defaults are changed. The tests in src/merge.test.ts fail. Fix deepMerge so it matches its doc comment. Do not change the tests.",
+  "verify": "bun test src"
+}

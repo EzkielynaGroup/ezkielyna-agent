@@ -1,0 +1,8 @@
+{
+  "id": "awam-02-daftar-tamu",
+  "category": "awam",
+  "lang": "id",
+  "title": "Rapikan daftar tamu undangan",
+  "prompt": "Saya mau cetak daftar tamu undangan nikahan, tapi nama-nama di tamu.txt berantakan (ada yang huruf besar semua, ada spasi berlebih, ada yang ditulis dua kali). Tolong rapikan: huruf depan tiap kata kapital, hapus nama yang dobel, urutkan sesuai abjad, kasih nomor urut, lalu simpan ke daftar_tamu.txt. Contoh barisnya: \"1. Ahmad\".",
+  "verify": "python3 .verify/check.py"
+}

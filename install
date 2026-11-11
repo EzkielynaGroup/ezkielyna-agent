@@ -1,0 +1,177 @@
+#!/bin/sh
+# Ezkielyna Agent CLI installer (macOS, Linux, WSL). No sudo. Verifies an offline ECDSA signature and the SHA-256 of
+# the archive before anything is installed. Never touches ~/.opencode or any upstream OpenCode install.
+#
+#   curl -fsSL https://ezkielyna.store/agent/install.sh | sh
+#   curl -fsSL https://ezkielyna.store/agent/install.sh | sh -s -- --help
+#   ./install --local ./release/<version>/files     (offline: use a release directory)
+#
+# Options:  --version V   --local DIR   --no-modify-path   --help
+# Environment: VERSION  EZK_INSTALL_DIR (default ~/.ezkielyna)  EZK_BASE_URL (default https://ezkielyna.store/agent/update)
+#              EZK_LIBC=glibc skips the musl (Alpine) check
+set -eu
+
+BASE="${EZK_BASE_URL:-https://ezkielyna.store/agent/update}"
+DIR="${EZK_INSTALL_DIR:-$HOME/.ezkielyna}"
+BIN="$DIR/bin"
+WANT="${VERSION:-}"
+LOCAL=""
+MODIFY_PATH=1
+
+# The usage text is embedded: `curl ... | sh -s -- --help` has no script file to read ($0 is "sh" then).
+usage() {
+  cat <<'USAGE'
+Ezkielyna Agent CLI installer (macOS, Linux, WSL). No sudo.
+Verifies an offline ECDSA signature and the SHA-256 of the archive before anything is installed.
+
+  curl -fsSL https://ezkielyna.store/agent/install.sh | sh
+  curl -fsSL https://ezkielyna.store/agent/install.sh | sh -s -- --help
+  ./install.sh --local <release dir>          offline: install from a downloaded release directory
+
+Options:
+  --version V         install this version (it must be the signed current release)
+  --local DIR         use the files in DIR instead of downloading
+  --no-modify-path    do not add the install folder to your shell profile
+  -h, --help          show this text
+
+Environment:
+  VERSION             same as --version
+  EZK_INSTALL_DIR     where to install (default ~/.ezkielyna)
+  EZK_BASE_URL        where releases are downloaded from (default https://ezkielyna.store/agent/update)
+  EZK_ALLOW_DOWNGRADE=1   allow installing an older signed release
+  EZK_LIBC=glibc      skip the musl (Alpine) check
+USAGE
+}
+say() { printf '%s\n' "$*"; }
+die() { printf 'error: %s\n' "$*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || die "$1 is required"; }
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help) usage; exit 0 ;;
+    -v|--version) WANT="${2:?--version needs a value}"; shift 2 ;;
+    --local) LOCAL="${2:?--local needs a directory}"; shift 2 ;;
+    --no-modify-path) MODIFY_PATH=0; shift ;;
+    *) die "unknown option $1 (see --help)" ;;
+  esac
+done
+
+case "$(uname -s)" in Darwin) os=darwin ;; Linux) os=linux ;; *) die "unsupported OS $(uname -s); on Windows use install.ps1" ;; esac
+case "$(uname -m)" in arm64|aarch64) arch=arm64 ;; x86_64|amd64) arch=x64 ;; *) die "unsupported CPU $(uname -m)" ;; esac
+
+# The Linux builds link against glibc. Alpine and other musl systems cannot run them: say so instead of failing later with "not found".
+is_musl() {
+  case "${EZK_LIBC:-}" in musl) return 0 ;; glibc) return 1 ;; esac
+  [ -f /etc/alpine-release ] && return 0
+  if command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi musl; then return 0; fi
+  for f in /lib/ld-musl-*; do [ -e "$f" ] && return 0; done
+  return 1
+}
+if [ "$os" = linux ] && is_musl; then
+  die "this system uses musl libc (Alpine Linux), and the Ezkielyna Agent builds need glibc (Ubuntu, Debian, Fedora, Arch, ...). Alpine is not supported yet; use a glibc distribution or a container such as ubuntu:24.04."
+fi
+
+need tar; need uname; need awk; need sed
+command -v openssl >/dev/null 2>&1 || die "openssl is required to check the signature of the download. Install it (Debian/Ubuntu: sudo apt install openssl; Fedora: sudo dnf install openssl), then run the same command again."
+[ -n "$LOCAL" ] || need curl
+
+# Network downloads: retry flaky connections, and resume the (large) archive. --retry-all-errors needs curl 7.71+.
+CURL_RETRY="--retry 3 --retry-delay 2"
+if [ -z "$LOCAL" ] && { curl --help all 2>/dev/null || curl --help 2>/dev/null; } | grep -q -- '--retry-all-errors'; then
+  CURL_RETRY="--retry 3 --retry-all-errors --retry-delay 2"
+fi
+
+tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT INT TERM
+
+# Release signing key (ECDSA P-256, key id 6f357cf04af3cb4d). The private key stays offline on the maintainer's Mac.
+cat > "$tmp/pub.pem" <<'PEM'
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6pZu7S24ONm8sScK1XgKDsklqr0F
+t1So/uGHhPABBqbyLQjo5Tr7nJ0wI26IS+pbZowhgmkSJw/tHxifomD9yw==
+-----END PUBLIC KEY-----
+PEM
+
+download_failed() { # url curl-exit-code
+  die "download failed (curl exit code $2): $1
+Check your internet connection and run the same command again; a partly downloaded file is resumed."
+}
+fetch() { # name -> $tmp/name
+  if [ -n "$LOCAL" ]; then cp "$LOCAL/$1" "$tmp/$1" 2>/dev/null || die "missing $LOCAL/$1"; else
+    rc=0; # shellcheck disable=SC2086
+    curl -fsSL $CURL_RETRY "$BASE/$1" -o "$tmp/$1" || rc=$?
+    [ "$rc" -eq 0 ] || download_failed "$BASE/$1" "$rc"
+  fi
+}
+verify() { # name: file must carry a valid signature NAME.sig
+  fetch "$1"; fetch "$1.sig"
+  openssl dgst -sha256 -verify "$tmp/pub.pem" -signature "$tmp/$1.sig" "$tmp/$1" >/dev/null 2>&1 || die "signature of $1 does not verify; refusing to install"
+}
+
+verify latest.json
+verify SHA256SUMS
+ver="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$tmp/latest.json" | head -n1)"
+[ -n "$ver" ] || die "latest.json has no version"
+[ -z "$WANT" ] || [ "$WANT" = "$ver" ] || die "requested version $WANT is not the signed current release ($ver)"
+
+# No downgrade: a replayed older (but genuinely signed) manifest must not replace a newer install. EZK_ALLOW_DOWNGRADE=1 overrides.
+cur="$("$DIR/current/ezkielyna" --version 2>/dev/null | head -n1 || true)"
+if [ -n "$cur" ] && [ "$cur" != "$ver" ] && [ "${EZK_ALLOW_DOWNGRADE:-0}" != 1 ]; then
+  newest="$(printf '%s\n%s\n' "$cur" "$ver" | sort -V | tail -n1)"
+  [ "$newest" != "$cur" ] || die "installed version $cur is newer than the signed release $ver; refusing to downgrade (set EZK_ALLOW_DOWNGRADE=1 to force)"
+fi
+
+name="ezkielyna-$ver-$os-$arch.tar.gz"
+want="$(grep "  $name\$" "$tmp/SHA256SUMS" | awk '{print $1}' | head -n1)"
+[ -n "$want" ] || die "$name is not listed in the signed SHA256SUMS"
+
+say "Ezkielyna Agent $ver ($os-$arch)"
+if [ -n "$LOCAL" ]; then cp "$LOCAL/$name" "$tmp/$name" || die "missing $LOCAL/$name"; else
+  rc=0; # shellcheck disable=SC2086
+  curl -fL $CURL_RETRY -C - --progress-bar "$BASE/$name" -o "$tmp/$name" || rc=$?
+  [ "$rc" -eq 0 ] || download_failed "$BASE/$name" "$rc"
+fi
+if command -v sha256sum >/dev/null 2>&1; then got="$(sha256sum "$tmp/$name" | awk '{print $1}')"; else got="$(shasum -a 256 "$tmp/$name" | awk '{print $1}')"; fi
+[ "$want" = "$got" ] || die "checksum mismatch for $name (expected $want, got $got)"
+
+dest="$DIR/versions/$ver"
+rm -rf "$dest"; mkdir -p "$dest" "$BIN"
+tar -xzf "$tmp/$name" -C "$dest" --strip-components=1
+chmod +x "$dest/ezkielyna"
+[ "$os" != darwin ] || xattr -dr com.apple.quarantine "$dest" 2>/dev/null || true
+ln -sfn "$dest/ezkielyna" "$BIN/ezkielyna"
+ln -sfn "$dest/ezkielyna" "$BIN/ezk"
+ln -sfn "$dest" "$DIR/current"
+
+say "Installed: $BIN/ezkielyna (alias: ezk)"
+case ":$PATH:" in
+  *":$BIN:"*) ;;
+  *)
+    line="export PATH=\"$BIN:\$PATH\""
+    shell_name="$(basename "${SHELL:-sh}")"
+    added=0
+    if [ "$MODIFY_PATH" = 1 ]; then
+      for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
+        [ -f "$rc" ] || continue
+        if grep -qF "$BIN" "$rc"; then added=1
+        elif printf '\n# Ezkielyna Agent\n%s\n' "$line" >> "$rc"; then say "Added $BIN to PATH in $rc (open a new terminal)"; added=1
+        fi
+      done
+      # macOS has zsh as the login shell and often no ~/.zshrc yet: create it, so a new terminal finds the command.
+      if [ "$added" = 0 ] && [ "$os" = darwin ] && [ "$shell_name" = zsh ] && [ ! -e "$HOME/.zshrc" ]; then
+        if printf '# Ezkielyna Agent\n%s\n' "$line" > "$HOME/.zshrc"; then say "Created $HOME/.zshrc and added $BIN to PATH (open a new terminal)"; added=1; fi
+      fi
+    fi
+    if [ "$added" = 0 ]; then
+      case "$shell_name" in
+        zsh) profile="$HOME/.zshrc" ;;
+        bash) if [ "$os" = darwin ]; then profile="$HOME/.bash_profile"; else profile="$HOME/.bashrc"; fi ;;
+        fish) profile="" ;;
+        *) profile="$HOME/.profile" ;;
+      esac
+      say "To use the command, add it to your PATH:"
+      if [ -n "$profile" ]; then say "  echo '$line' >> $profile"; else say "  fish_add_path $BIN"; fi
+      say "then open a new terminal."
+    fi
+    ;;
+esac
+say "Run:  ezkielyna     (first run asks for your Ezkielyna API key: https://api.ezkielyna.store/keys)"

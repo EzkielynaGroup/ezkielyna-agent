@@ -1,0 +1,23 @@
+{
+  "system": "496ada3bb6ba85b652a747784657b7470e1ee795f288727aece9aa20f0c20bf1",
+  "toolsAndEditSchema": "6e9d743d857dc16716fb2fd26433c9300084babbcd776040ad10978fcf9a979f",
+  "bytes": 17611,
+  "promptFiles": {
+    "anthropic.txt": "98a855b61f4658bfe6f8b90f906dc68fe7b6e866ab9b1f9ff5a8da22e1c94eb8",
+    "beast.txt": "16d1f484f77550dba08f0a3a0a3fbb6a6c141fdb55773c08c4d4a828a75cc07b",
+    "build-switch.txt": "5e3db616a685a3dfaaf95fb86ae6e2acfbdf520bda60f7b27f727d2a88ba8a25",
+    "codex.txt": "e5040f222572c45c8ac0ad007ad2b9a3f08936c409ef263722728e5fd6f6c09d",
+    "copilot-gpt-5.txt": "1bee3cb60eb67507ca5337f17f2ad677134e9842d3cd9fe340f7fcd139a1ee71",
+    "default.txt": "1f987eff7c3c7be97c9ff6f198eafb32471d798e956d9fd923d632dbaf0736fb",
+    "ezkielyna.txt": "d13de51cc3677b8d14b5e88dca0448f1df70c54b0af4ec1c11579fc4e348c07d",
+    "gemini.txt": "ef91b00bb8b32c65561133ed8342e2454bf7948f6b52390cb037533fb74126c8",
+    "gpt-astra.txt": "f3ea7cbc33c4fbff0ea5f0c717ea5542f9443da6f82d1bcf7503e7dbc85ce45d",
+    "gpt.txt": "b84aa93b8ebd5c7f9261e7c966ca90586ad6da97051e91b8446987ab7dbb90de",
+    "kimi.txt": "8435ba3f1f46f0bbae9ddd21335e775e1be720c071d20251625bc0376406af65",
+    "meta.txt": "5612d0957ffcb36374f2f925f61919d3413bf960ea3f7b810a12138b9f23e42b",
+    "plan-mode.txt": "473381e8f20d054fa24ed3631a3b741a4fd432dadb8a0f0925f73d94a6e2866c",
+    "plan-reminder-anthropic.txt": "8c4517ba847f753b2e25f7056ddc393f6728074fa6444d4070d121e75b1f91b5",
+    "plan.txt": "455db97e0d21e8097c2afb539d167b4b2483e99b585dbc4fff23cafd4a3029b8",
+    "trinity.txt": "600a5e4c446cd2c4d9ea8661af1a8e9dd1532346bf3ea74b9f107ead4422d51c"
+  }
+}

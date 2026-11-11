@@ -1,0 +1,7 @@
+# Test fixtures for the memory secret scanner contain fake, documented example credentials (AWS AKIA...EXAMPLE,
+# 4111 test card, dummy JWT/Bearer strings). They are not real secrets.
+version: 2
+secret:
+  ignored_paths:
+    - "packages/core/test/ezk/**"
+    - "packages/core/test/ezkielyna/**"

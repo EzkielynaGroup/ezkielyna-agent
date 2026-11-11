@@ -1,0 +1,15 @@
+
+
+
+
+
+
+
+
+                 Apply this rewind?                                   esc
+
+                 Restore files and remove messages from this point
+                 onward? You can use /redo for the file changes.
+
+
+                                                    Cancel  Apply Rewind

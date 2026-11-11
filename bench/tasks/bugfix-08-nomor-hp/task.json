@@ -1,0 +1,8 @@
+{
+  "id": "bugfix-08-nomor-hp",
+  "category": "bugfix",
+  "lang": "id",
+  "title": "Normalisasi nomor HP Indonesia",
+  "prompt": "Daftar kontak pelanggan banyak yang dobel karena nomor HP-nya ditulis beda-beda (pakai strip, spasi, awalan 0 atau 62). Fungsi normalisasi di nomor.py harusnya menyeragamkan semuanya ke format +62 tanpa spasi, tapi test di tests/test_nomor.py gagal. Tolong perbaiki fungsinya (jalankan test dengan `python3 -m unittest discover -s tests`).",
+  "verify": "python3 -m unittest discover -s tests -v"
+}

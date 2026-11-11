@@ -1,0 +1,58 @@
+diff --git a/src/akun.ts b/src/akun.ts
+index 62b0e12..b17051a 100644
+--- a/src/akun.ts
++++ b/src/akun.ts
+@@ -1,8 +1,9 @@
++import { PESAN } from "./pesan"
+ export type Akun = { id: string; saldo: number; diblokir: boolean }
+ 
+ export function cariAkun(daftar: Akun[], id: string) {
+   const akun = daftar.find((item) => item.id === id)
+-  if (!akun) throw new Error("Akun tidak ditemukan")
+-  if (akun.diblokir) throw new Error("Akun sedang diblokir, hubungi layanan pelanggan")
++  if (!akun) throw new Error(PESAN.akunTidakAda)
++  if (akun.diblokir) throw new Error(PESAN.akunDiblokir)
+   return akun
+ }
+diff --git a/src/pesan.ts b/src/pesan.ts
+new file mode 100644
+index 0000000..899586e
+--- /dev/null
++++ b/src/pesan.ts
+@@ -0,0 +1,7 @@
++export const PESAN = {
++  akunTidakAda: "Akun tidak ditemukan",
++  akunDiblokir: "Akun sedang diblokir, hubungi layanan pelanggan",
++  jumlahTidakValid: "Jumlah transfer harus lebih dari nol",
++  saldoKurang: "Saldo tidak cukup",
++  pinTidakValid: "PIN harus 6 digit angka",
++} as const
+diff --git a/src/pin.ts b/src/pin.ts
+index e539907..de4ab80 100644
+--- a/src/pin.ts
++++ b/src/pin.ts
+@@ -1,4 +1,5 @@
++import { PESAN } from "./pesan"
+ export function cekPin(pin: string) {
+-  if (!/^\d{6}$/.test(pin)) throw new Error("PIN harus 6 digit angka")
++  if (!/^\d{6}$/.test(pin)) throw new Error(PESAN.pinTidakValid)
+   return true
+ }
+diff --git a/src/transfer.ts b/src/transfer.ts
+index 15ad26b..14f592d 100644
+--- a/src/transfer.ts
++++ b/src/transfer.ts
+@@ -1,10 +1,11 @@
++import { PESAN } from "./pesan"
+ import { cariAkun, type Akun } from "./akun"
+ 
+ export function transfer(daftar: Akun[], dari: string, ke: string, jumlah: number) {
+-  if (jumlah <= 0) throw new Error("Jumlah transfer harus lebih dari nol")
++  if (jumlah <= 0) throw new Error(PESAN.jumlahTidakValid)
+   const asal = cariAkun(daftar, dari)
+   const tujuan = cariAkun(daftar, ke)
+-  if (asal.saldo < jumlah) throw new Error("Saldo tidak cukup")
++  if (asal.saldo < jumlah) throw new Error(PESAN.saldoKurang)
+   asal.saldo -= jumlah
+   tujuan.saldo += jumlah
+ }

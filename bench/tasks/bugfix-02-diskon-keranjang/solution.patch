@@ -1,0 +1,11 @@
+diff --git a/src/diskon.ts b/src/diskon.ts
+index 3559531..8e6ca92 100644
+--- a/src/diskon.ts
++++ b/src/diskon.ts
+@@ -1,5 +1,5 @@
+ /** Mengembalikan BESAR POTONGAN (dalam rupiah) untuk nominal dan persen diskon tertentu. */
+ export function terapkanDiskon(nominal: number, persen: number) {
+   if (persen < 0 || persen > 100) throw new RangeError("persen harus 0-100")
+-  return nominal - (nominal * persen) / 100
++  return (nominal * persen) / 100
+ }

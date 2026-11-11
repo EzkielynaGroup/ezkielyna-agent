@@ -1,0 +1,15 @@
+diff --git a/csvlite.py b/csvlite.py
+index 542d163..f067d82 100644
+--- a/csvlite.py
++++ b/csvlite.py
+@@ -4,7 +4,9 @@ def parse_line(line):
+     Supports double-quoted fields that contain commas and "" as an escaped quote.
+     Whitespace around unquoted fields is stripped. Empty fields are kept.
+     """
+-    return [field.strip() for field in line.split(",")]
++    import csv
++
++    return [field.strip() for field in next(csv.reader([line]))]
+ 
+ 
+ def parse(text):

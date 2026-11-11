@@ -1,0 +1,104 @@
+diff --git a/cache/cache.go b/cache/cache.go
+index 3b91b47..9c24076 100644
+--- a/cache/cache.go
++++ b/cache/cache.go
+@@ -1,22 +1,49 @@
+ package cache
+ 
++import "time"
++
++type entry[V any] struct {
++	value   V
++	expires time.Time
++}
++
+ type Cache[K comparable, V any] struct {
+-	entries map[K]V
++	entries map[K]entry[V]
++	ttl     time.Duration
++	now     func() time.Time
+ }
+ 
+-func New[K comparable, V any]() *Cache[K, V] {
+-	return &Cache[K, V]{entries: map[K]V{}}
++func New[K comparable, V any](ttl time.Duration, now func() time.Time) *Cache[K, V] {
++	if now == nil {
++		now = time.Now
++	}
++	return &Cache[K, V]{entries: map[K]entry[V]{}, ttl: ttl, now: now}
+ }
+ 
+ func (c *Cache[K, V]) Get(key K) (V, bool) {
+-	value, ok := c.entries[key]
+-	return value, ok
++	e, ok := c.entries[key]
++	if !ok || !c.now().Before(e.expires) {
++		delete(c.entries, key)
++		var zero V
++		return zero, false
++	}
++	return e.value, true
+ }
+ 
+ func (c *Cache[K, V]) Set(key K, value V) {
+-	c.entries[key] = value
++	c.SetTTL(key, value, c.ttl)
++}
++
++func (c *Cache[K, V]) SetTTL(key K, value V, ttl time.Duration) {
++	c.entries[key] = entry[V]{value: value, expires: c.now().Add(ttl)}
+ }
+ 
+ func (c *Cache[K, V]) Len() int {
+-	return len(c.entries)
++	n := 0
++	for _, e := range c.entries {
++		if c.now().Before(e.expires) {
++			n++
++		}
++	}
++	return n
+ }
+diff --git a/cache/cache_test.go b/cache/cache_test.go
+new file mode 100644
+index 0000000..51d9232
+--- /dev/null
++++ b/cache/cache_test.go
+@@ -0,0 +1,16 @@
++package cache
++
++import (
++	"testing"
++	"time"
++)
++
++func TestSetTTL(t *testing.T) {
++	now := time.Unix(0, 0)
++	c := New[string, string](time.Second, func() time.Time { return now })
++	c.SetTTL("k", "v", 10*time.Millisecond)
++	now = now.Add(10 * time.Millisecond)
++	if _, ok := c.Get("k"); ok {
++		t.Fatal("expired entry returned")
++	}
++}
+diff --git a/kurs/kurs.go b/kurs/kurs.go
+index dce6e33..d7bfa1d 100644
+--- a/kurs/kurs.go
++++ b/kurs/kurs.go
+@@ -1,10 +1,14 @@
+ package kurs
+ 
+-import "example.com/kurs/cache"
++import (
++	"time"
++
++	"example.com/kurs/cache"
++)
+ 
+ // Buat membungkus fungsi pengambil kurs dengan cache.
+ func Buat(ambil func(kode string) float64) func(kode string) float64 {
+-	c := cache.New[string, float64]()
++	c := cache.New[string, float64](time.Minute, nil)
+ 	return func(kode string) float64 {
+ 		if nilai, ok := c.Get(kode); ok {
+ 			return nilai

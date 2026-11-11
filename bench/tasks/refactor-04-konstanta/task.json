@@ -1,0 +1,8 @@
+{
+  "id": "refactor-04-konstanta",
+  "category": "refactor",
+  "lang": "mix",
+  "title": "Pindahkan magic number ke constants.py",
+  "prompt": "Angka PPN 0.11 dan ongkir dasar 15000 di-copy di harga.py, ongkir.py dan invoice.py. Please move them into a new module constants.py as PPN = 0.11 and ONGKIR_DASAR = 15000, lalu pakai konstanta itu di ketiga file. Hasil perhitungan tidak boleh berubah; tests ada di tests/ (python3 -m unittest discover -s tests).",
+  "verify": "python3 -m unittest discover -s tests -v && python3 .verify/check.py"
+}

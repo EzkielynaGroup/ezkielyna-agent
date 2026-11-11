@@ -1,0 +1,6 @@
+# See packages/app/bunfig.toml: Bun 1.4 compiles this package's .tsx with the automatic dev runtime
+# (`solid-js/jsx-dev-runtime`, which solid-js only ships for types), so any test touching a component fails to
+# link. Pin the classic runtime explicitly; the tests never render JSX.
+jsx = "react"
+jsxFactory = "SolidJsxIsNotCompiledByBunTest"
+jsxFragment = "SolidJsxIsNotCompiledByBunTest"

@@ -1,0 +1,13 @@
+diff --git a/customers_clean.csv b/customers_clean.csv
+new file mode 100644
+index 0000000..9549198
+--- /dev/null
++++ b/customers_clean.csv
+@@ -0,0 +1,7 @@
++name,email,signup_date
++Siti Aminah,siti@example.com,2026-01-02
++Budi Santoso,budi@example.com,2026-01-03
++Rahmat Hidayat,rahmat@mail.id,2026-02-01
++Dewi Lestari,dewi@mail.id,2026-02-07
++Ahmad,ahmad@mail.id,2026-02-15
++Eko Prasetyo,eko@mail.id,2026-03-01

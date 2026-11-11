@@ -1,0 +1,16 @@
+
+
+
+
+
+
+
+
+     What should go back? — change the login form and add a test                  esc
+
+     Search
+
+     Files and chat Undo the file changes and the messages from here (/redo brings th
+     Files only Undo the file changes from here; keep the chat
+     Chat only Remove the messages from here; keep the files as they are
+     Summarize from here Replace the messages from here with a short summary (cannot

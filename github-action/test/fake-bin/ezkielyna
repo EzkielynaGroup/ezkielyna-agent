@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Fake `ezkielyna` for tests: emits canned `exec --json` events. No network, no key.
+# FAKE_EZK_MODE: ok (default) | review | fail | budget. FAKE_EZK_EDIT=path creates a file (fix-ci).
+mode="${FAKE_EZK_MODE:-ok}"
+out=""; while [ $# -gt 0 ]; do case "$1" in -o) out="$2"; shift 2;; *) shift;; esac; done
+cat >/dev/null  # prompt from stdin
+[ -n "${FAKE_EZK_ARGS_FILE:-}" ] && echo "key_len=${#EZKIELYNA_API_KEY} trust=${EZK_TRUST_PROJECT:-}" >> "$FAKE_EZK_ARGS_FILE"
+[ -n "${FAKE_EZK_ARGS_FILE:-}" ] && echo "cfg=$(cat ezkielyna.jsonc opencode.jsonc .mcp.json 2>/dev/null | tr -d '\n ') plug=$(ls .ezkielyna/plugins 2>/dev/null | tr '\n' ,)" >> "$FAKE_EZK_ARGS_FILE"
+echo '{"type":"thread.started","thread_id":"fake-1"}'
+echo '{"type":"turn.started"}'
+if [ "$mode" = fail ]; then
+  echo '{"type":"turn.failed","error":{"message":"gateway said no"}}'; exit 1
+fi
+if [ -n "${FAKE_EZK_EDIT:-}" ]; then
+  mkdir -p "$(dirname "$FAKE_EZK_EDIT")"; echo "fixed" > "$FAKE_EZK_EDIT"
+  echo "{\"type\":\"item.completed\",\"item\":{\"type\":\"file_change\",\"changes\":[{\"path\":\"$FAKE_EZK_EDIT\",\"kind\":\"add\"}],\"status\":\"completed\"}}"
+fi
+if [ "$mode" = review ]; then
+  msg='{"summary":"One issue found.","findings":[{"severity":"P1","title":"Null deref","file":"src/a.ts","line":12,"body":"x can be undefined here."}]}'
+else
+  msg='All done.'
+fi
+esc=$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')
+echo "{\"type\":\"item.completed\",\"item\":{\"type\":\"agent_message\",\"text\":\"$esc\"}}"
+echo '{"type":"turn.completed","usage":{"input_tokens":1000,"cached_input_tokens":200,"output_tokens":50,"cost_usd":0.0123}}'
+[ -n "$out" ] && printf '%s' "$msg" > "$out"
+[ "$mode" = budget ] && exit 2
+exit 0

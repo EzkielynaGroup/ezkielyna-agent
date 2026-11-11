@@ -1,0 +1,66 @@
+[data-component="empty-state-v2"] {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border: 1px solid var(--v2-border-border-muted);
+  border-radius: 12px;
+  background: var(--v2-background-bg-card, var(--v2-background-bg-layer-02));
+  text-align: center;
+}
+
+[data-component="empty-state-v2"][data-size="compact"] {
+  gap: 6px;
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+[data-component="empty-state-v2"][data-size="compact"] [data-slot="empty-state-icon"] {
+  display: none;
+}
+
+[data-component="empty-state-v2"][data-size="compact"] [data-slot="empty-state-title"] {
+  font-family: var(--font-family-text, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+[data-component="empty-state-v2"][data-size="compact"] [data-slot="empty-state-description"] {
+  font-size: 11px;
+}
+
+[data-slot="empty-state-icon"] {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--v2-brand-tint, var(--v2-background-bg-layer-02));
+  color: var(--v2-brand-ink, var(--v2-text-text-accent));
+}
+
+[data-slot="empty-state-icon"] svg {
+  width: 18px;
+  height: 18px;
+}
+
+[data-slot="empty-state-title"] {
+  margin: 0;
+  color: var(--v2-text-text-base);
+  font-family: var(--font-family-heading, "Source Serif 4", Georgia, serif);
+  font-size: 18px;
+  font-weight: 550;
+  line-height: 1.25;
+}
+
+[data-slot="empty-state-description"] {
+  max-width: 360px;
+  margin: 0;
+  color: var(--v2-text-text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}

@@ -1,0 +1,137 @@
+name: build
+
+# Heavy builds of the CLI and the desktop app, so they do not have to run on a laptop.
+# Unsigned test builds only: no secrets, no signing keys, nothing is published. Download the
+# artefacts from the run page (Summary → Artifacts) or with `gh run download`.
+# The per-platform job lives in build-target.yml.
+
+# Ezkielyna: no automatic run on branch pushes. Windows and macOS runners are slow, so a
+# push-triggered run would queue on every commit.
+#   - pull requests into main: linux-x64 only (CLI + desktop);
+#   - manual runs (Actions tab, "Run workflow") and v* tags: linux-x64, windows-x64 (CLI + desktop) and macos-arm64 (CLI).
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+      - "**/README*.md"
+      - "**/CHANGELOG*.md"
+      - "**/AGENTS.md"
+      - "**/*.mdx"
+      - "docs/**"
+      - "packages/docs/**"
+      - "packages/web/**"
+      - "specs/**"
+      - "LICENSE"
+      - "NOTICE"
+      - "*.png"
+      - ".github/ISSUE_TEMPLATE/**"
+  push:
+    # Release tags only; there is deliberately no `branches:` entry. Path filters do not apply to tag pushes.
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      windows_artifacts_run:
+        description: "Run ID of an earlier build run: skip every build and run only windows-smoke against that run's windows-x64 artefacts (kept 3 days)."
+        type: string
+        required: false
+        default: ""
+
+concurrency:
+  # A smoke-only dispatch must not cancel (or be cancelled by) a full build on the same ref.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.windows_artifacts_run || 'full' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  linux-x64:
+    if: inputs.windows_artifacts_run == ''
+    uses: ./.github/workflows/build-target.yml
+    with:
+      name: linux-x64
+      runner: ubuntu-24.04
+      timeout: 60
+      cli: opencode-linux-x64
+      desktop: --linux AppImage deb tar.gz --x64
+
+  windows-x64:
+    if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) && inputs.windows_artifacts_run == ''
+    uses: ./.github/workflows/build-target.yml
+    with:
+      name: windows-x64
+      runner: windows-2025
+      timeout: 75
+      cli: opencode-windows-x64
+      desktop: --win nsis zip --x64
+
+  windows-smoke:
+    # Real artifact verification is intentionally manual-dispatch only; PRs do not use Windows minutes.
+    # !cancelled() keeps the job when windows-x64 was skipped on purpose (windows_artifacts_run); otherwise it still needs that build.
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && (inputs.windows_artifacts_run != '' || needs.windows-x64.result == 'success') }}
+    needs: windows-x64
+    runs-on: windows-2025
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      # Only to read the artefacts of an earlier run (windows_artifacts_run).
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+
+      - name: Read Bun version
+        id: meta
+        shell: bash
+        run: |
+          echo "bun=$(node -p "require('./package.json').packageManager.split('@')[1]")" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ steps.meta.outputs.bun }}
+
+      - name: Download Windows build artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: ezkielyna-windows-x64-*
+          merge-multiple: true
+          path: artifacts
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.windows_artifacts_run || github.run_id }}
+
+      - name: Run Windows artifact smoke
+        run: bun scripts/ci/smoke-windows.ts artifacts
+
+      - name: Upload Windows smoke logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: windows-smoke-logs
+          path: artifacts/windows-smoke/
+          if-no-files-found: ignore
+          retention-days: 3
+
+  macos-arm64:
+    # CLI only; the Mac desktop app is built locally.
+    if: (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) && inputs.windows_artifacts_run == ''
+    uses: ./.github/workflows/build-target.yml
+    with:
+      name: macos-arm64
+      runner: macos-15
+      timeout: 40
+      cli: opencode-darwin-arm64

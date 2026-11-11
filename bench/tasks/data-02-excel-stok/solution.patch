@@ -1,0 +1,21 @@
+diff --git a/low_stock.csv b/low_stock.csv
+new file mode 100644
+index 0000000..602fd15
+--- /dev/null
++++ b/low_stock.csv
+@@ -0,0 +1,15 @@
++sku,nama,qty,kekurangan
++SKU-002,Minyak Goreng 2L,4,26
++SKU-008,Susu UHT 1L,11,19
++SKU-010,Teh Celup 25s,15,15
++SKU-020,Margarin 200g,15,15
++SKU-016,Garam Dapur,7,13
++SKU-018,Biskuit Kelapa,20,10
++SKU-004,Telur 1 Rak,7,8
++SKU-006,Kecap Manis 600ml,7,8
++SKU-021,Santan Kara,22,8
++SKU-013,Pasta Gigi,9,6
++SKU-003,Gula Pasir 1kg,7,3
++SKU-012,Sampo Sachet,27,3
++SKU-005,Tepung Terigu 1kg,9,1
++SKU-023,Kerupuk Udang,9,1

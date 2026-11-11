@@ -1,0 +1,171 @@
+name: test
+
+# Full test suite on Linux only: every package's `test` script through turbo, the generated-client
+# check and the HttpApi exerciser gates. All three always run to the end; the failing tests are
+# collected into a report (job summary, `test-report` artefact, and one comment on the PR that is
+# updated on every run) so they can be fixed on the application branch. The job still fails when
+# any step failed. Tests talk to in-process mock servers; no API keys or other secrets are used.
+
+# Ezkielyna: no automatic run on push. Windows and macOS runners are slow, so a push-triggered run
+# would queue on every commit. Tests run on pull requests into main and on demand (Actions tab, "Run workflow").
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+      - "**/README*.md"
+      - "**/CHANGELOG*.md"
+      - "**/AGENTS.md"
+      - "**/*.mdx"
+      - "docs/**"
+      - "packages/docs/**"
+      - "packages/web/**"
+      - "specs/**"
+      - "LICENSE"
+      - "NOTICE"
+      - "*.png"
+      - ".github/ISSUE_TEMPLATE/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: unit (linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      # Only for the test-report comment on pull requests (automatic GITHUB_TOKEN, no stored secret).
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+
+      - name: Read Bun version
+        id: meta
+        run: |
+          echo "bun=$(node -p "require('./package.json').packageManager.split('@')[1]")" >> "$GITHUB_OUTPUT"
+          echo "BUN_INSTALL_CACHE_DIR=$HOME/.bun/install/cache" >> "$GITHUB_ENV"
+
+      - name: Setup Bun ${{ steps.meta.outputs.bun }}
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ steps.meta.outputs.bun }}
+
+      - name: Restore Bun package cache
+        id: bun-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-${{ runner.arch }}-${{ steps.meta.outputs.bun }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Save Bun package cache
+        # Saved right after install instead of in a post step, so a later failing step (tests, smoke) does not
+        # throw the cache away.
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ steps.bun-cache.outputs.cache-primary-key }}
+
+      - name: Configure git identity
+        # Some tests create commits in temporary repositories.
+        run: |
+          git config --global user.email "ci@ezkielyna.invalid"
+          git config --global user.name "ezkielyna-ci"
+          mkdir -p test-output
+
+      - name: Run unit tests
+        id: unit
+        continue-on-error: true
+        # GITHUB_ACTIONS=false keeps tests that read it (e.g. the GitHub Action command) on their local code path.
+        # --log-prefix=task prefixes every line with "<package>:test: " for scripts/ci/test-report.ts.
+        run: |
+          GITHUB_ACTIONS=false bun turbo test --continue --log-order=grouped --log-prefix=task 2>&1 | tee test-output/unit.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Check generated client
+        id: generated
+        continue-on-error: true
+        working-directory: packages/client
+        run: |
+          bun run check:generated 2>&1 | tee ../../test-output/generated.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Run HttpApi exerciser gates
+        id: httpapi
+        continue-on-error: true
+        working-directory: packages/opencode
+        run: |
+          bun run test:httpapi 2>&1 | tee ../../test-output/httpapi.log
+          exit "${PIPESTATUS[0]}"
+
+      - name: Write test report
+        if: ${{ !cancelled() }}
+        env:
+          UNIT_OUTCOME: ${{ steps.unit.outcome }}
+          GENERATED_OUTCOME: ${{ steps.generated.outcome }}
+          HTTPAPI_OUTCOME: ${{ steps.httpapi.outcome }}
+        run: |
+          bun scripts/ci/test-report.ts test-output > /dev/null
+          cat test-output/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-report-${{ github.run_id }}
+          path: test-output/
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Comment test report on the PR
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          marker="<!-- ezkielyna-test-report -->"
+          {
+            echo "$marker"
+            head -c 60000 test-output/report.md
+            echo
+            echo "Commit \`${GITHUB_SHA::7}\` · [run]($RUN_URL) · full list in the \`test-report-${{ github.run_id }}\` artefact (\`failures.tsv\`, logs)."
+          } > test-output/comment.md
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | contains(\"$marker\"))) | .id" | head -n 1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@test-output/comment.md > /dev/null
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F body=@test-output/comment.md > /dev/null
+          fi
+
+      - name: Fail when any test step failed
+        if: steps.unit.outcome == 'failure' || steps.generated.outcome == 'failure' || steps.httpapi.outcome == 'failure'
+        run: |
+          echo "::error::unit=${{ steps.unit.outcome }} generated=${{ steps.generated.outcome }} httpapi=${{ steps.httpapi.outcome }}; see the test report"
+          exit 1

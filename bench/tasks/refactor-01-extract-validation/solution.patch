@@ -1,0 +1,47 @@
+diff --git a/src/invite.ts b/src/invite.ts
+index 3d709bf..5db3813 100644
+--- a/src/invite.ts
++++ b/src/invite.ts
+@@ -1,5 +1,6 @@
++import { isValidEmail } from "./validation"
+ export function invite(from: string, to: string) {
+-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(from)) throw new Error(`invalid email: ${from}`)
+-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) throw new Error(`invalid email: ${to}`)
++  if (!isValidEmail(from)) throw new Error(`invalid email: ${from}`)
++  if (!isValidEmail(to)) throw new Error(`invalid email: ${to}`)
+   return { from, to, subject: `${from} invited you` }
+ }
+diff --git a/src/newsletter.ts b/src/newsletter.ts
+index fd6ce87..e0a4d9b 100644
+--- a/src/newsletter.ts
++++ b/src/newsletter.ts
+@@ -1,7 +1,8 @@
++import { isValidEmail } from "./validation"
+ const subscribers = new Set<string>()
+ 
+ export function subscribe(email: string) {
+-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`invalid email: ${email}`)
++  if (!isValidEmail(email)) throw new Error(`invalid email: ${email}`)
+   subscribers.add(email.toLowerCase())
+   return subscribers.size
+ }
+diff --git a/src/user.ts b/src/user.ts
+index 05cfcc7..595cb8b 100644
+--- a/src/user.ts
++++ b/src/user.ts
+@@ -1,4 +1,5 @@
++import { isValidEmail } from "./validation"
+ export function createUser(name: string, email: string) {
+-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`invalid email: ${email}`)
++  if (!isValidEmail(email)) throw new Error(`invalid email: ${email}`)
+   return { name, email: email.toLowerCase() }
+ }
+diff --git a/src/validation.ts b/src/validation.ts
+new file mode 100644
+index 0000000..63ca7ef
+--- /dev/null
++++ b/src/validation.ts
+@@ -0,0 +1,3 @@
++export function isValidEmail(email: string): boolean {
++  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
++}
