@@ -8,12 +8,17 @@ The offline ECDSA P-256 signature of latest.json and SHA256SUMS and the SHA-256 
 needed) BEFORE anything is extracted. Files go to %LOCALAPPDATA%\Ezkielyna (versions\<v>\ezkielyna.exe, bin\ezkielyna.cmd and bin\ezk.cmd)
 and only the current user's PATH is changed. An upstream OpenCode install is never touched.
 Environment: VERSION, EZK_BASE_URL (default https://ezkielyna.store/agent/update), EZK_ALLOW_DOWNGRADE=1 to install an older signed release.
+
+To uninstall, close any running ezkielyna.exe process, then remove the per-user CLI files and PATH entry in PowerShell:
+  $root = Join-Path $env:LOCALAPPDATA 'Ezkielyna'; $bin = Join-Path $root 'bin'
+  $path = [Environment]::GetEnvironmentVariable('Path','User')
+  [Environment]::SetEnvironmentVariable('Path', (($path -split ';' | Where-Object { $_ -and $_.TrimEnd([char]92).ToLowerInvariant() -ne $bin.TrimEnd([char]92).ToLowerInvariant() }) -join ';'), 'User')
+  Remove-Item -LiteralPath $root -Recurse -Force
 #>
 [CmdletBinding()]
 param([string]$Local = "", [string]$Version = $env:VERSION, [switch]$NoModifyPath)
 
 $ErrorActionPreference = 'Stop'
-$ProgressPreference = 'SilentlyContinue'   # the progress bar makes Windows PowerShell 5.1 downloads many times slower
 $Base = if ($env:EZK_BASE_URL) { $env:EZK_BASE_URL.TrimEnd('/') } else { 'https://ezkielyna.store/agent/update' }
 $LocalData = if ($env:LOCALAPPDATA) { $env:LOCALAPPDATA } else { [Environment]::GetFolderPath('LocalApplicationData') }
 if (-not $LocalData) { throw 'Could not locate the current user Local AppData directory.' }
@@ -93,6 +98,11 @@ function ConvertTo-VersionKey([string]$v) {
   return @([int]$Matches[1], [int]$Matches[2], [int]$Matches[3], $(if ($Matches[4]) { [int]$Matches[4] } else { 0 }))
 }
 
+# Windows PowerShell 5.1 redraws a progress bar for every chunk a download or an unzip handles, which turns fetching the ~60 MB archive
+# into minutes. Silence it while we run and put the caller's value back (`irm ... | iex` runs in the caller's scope).
+$PreviousProgress = $ProgressPreference
+$ProgressPreference = 'SilentlyContinue'
+
 try {
   New-Item -ItemType Directory -Path $Temp -Force | Out-Null
   $Manifest = Get-ReleaseFile 'latest.json'
@@ -108,7 +118,13 @@ try {
   if ($Version -and $Version -ne $ResolvedVersion) { throw "Requested version $Version is not the signed current release ($ResolvedVersion)." }
 
   # No downgrade: a replayed older (but genuinely signed) manifest must not replace a newer install.
-  $InstalledNow = Get-ChildItem -LiteralPath (Join-Path $InstallRoot 'versions') -Directory -ErrorAction SilentlyContinue | ForEach-Object { ConvertTo-VersionKey $_.Name } | Where-Object { $_ }
+  # A plain loop: piping the keys through ForEach-Object would unroll each 4-number array into loose numbers, and the comparison
+  # below would then treat 19 (from 1.19.3) as a major version and refuse a genuine upgrade such as 1.19.3-ezk.2 -> 1.19.3-ezk.5.
+  $InstalledNow = New-Object System.Collections.ArrayList
+  foreach ($dir in @(Get-ChildItem -LiteralPath (Join-Path $InstallRoot 'versions') -Directory -ErrorAction SilentlyContinue)) {
+    $key = ConvertTo-VersionKey $dir.Name
+    if ($key) { [void]$InstalledNow.Add($key) }
+  }
   $NewKey = ConvertTo-VersionKey $ResolvedVersion
   if ($env:EZK_ALLOW_DOWNGRADE -ne '1' -and $NewKey) {
     foreach ($cur in $InstalledNow) {
@@ -154,5 +170,6 @@ try {
   Write-Output "Installed Ezkielyna Agent $ResolvedVersion to $InstalledExe (commands: ezkielyna, ezk)."
   Write-Output 'Run: ezkielyna     (first run asks for your Ezkielyna API key: https://api.ezkielyna.store/keys)'
 } finally {
+  $ProgressPreference = $PreviousProgress
   Remove-Item -LiteralPath $Temp -Recurse -Force -ErrorAction SilentlyContinue
 }
